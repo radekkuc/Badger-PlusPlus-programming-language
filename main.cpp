@@ -8,7 +8,10 @@ int main(int, char**){
     //std::string line = "let x = 10 + 5 + 2;";
     //std::string line = "let x = 10 * 2 + 4;";
     //std::string line = "let x = 2 + 6 * (4 / 2) - 3;";
-    std::string line = "let x;";
+    //std::string line = "let x;";
+    //std::string line = "print(x);";
+    // TEST CHAINED EXPRESSIONS AGAIN because you moved variable creation to loop
+    std::string line = "print(4+2);";
     Lexer lexer(line);
     std::vector<Token> tokens = lexer.identify();
 

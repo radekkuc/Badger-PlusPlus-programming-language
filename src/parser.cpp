@@ -37,9 +37,28 @@ ASTNode* Parser::parseStatement() {
         else throw std::runtime_error("Expected variable declaration but got: " + tokens_[currIndex_].value);
     }
     else if(match(TokenType::PRINT)) {
-        return nullptr;
+        advance();
+        if(match(TokenType::LPAREN)) {
+            advance();
+            ASTNode* node = parseExpression();
+            if(!match(TokenType::RPAREN)) {
+                throw std::runtime_error("Missing closing paren");
+            }
+            advance();
+            return new ASTNode(NodeType::Print, "Print", node, nullptr);
+        }
+        throw std::runtime_error("Missing open paren");
     }
     // case for assigment, like x = 10;
+    else if(match(TokenType::VARIABLE)) {
+
+        advance();
+        if(match(TokenType::EQUALS)) {
+
+        }
+
+    }
+    
     return nullptr;
 }
 
@@ -58,8 +77,8 @@ ASTNode* Parser::parseExpression() {
 
 ASTNode* Parser::parseTerm() {
     ASTNode* left = parseFactor();
-    TokenType signToken = tokens_[currIndex_].type;
     while(match(TokenType::ASTERISK) || match(TokenType::SLASH)) {
+        TokenType signToken = tokens_[currIndex_].type;
         advance();
         
         ASTNode* right = parseFactor();
@@ -87,7 +106,9 @@ ASTNode* Parser::parseFactor() {
     }
 
     if(match(TokenType::VARIABLE)) {
-        
+        ASTNode* node = new ASTNode(NodeType::Variable, tokens_[currIndex_].value);
+        advance(); 
+        return node; 
     }
     throw std::runtime_error("Unexpected token: " + tokens_[currIndex_].value);
 }
