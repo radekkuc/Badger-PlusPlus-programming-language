@@ -2,7 +2,7 @@
 #include "lexer.h"
 
 enum class NodeType : uint8_t {
-    VarDecl, Print, Assigment,
+    VarDecl, Print, Assignment,
     Plus, Minus, Asterisk, Slash, Equal, Lparent, Rparen,
     Number, Variable
 };

@@ -11,7 +11,8 @@ int main(int, char**){
     //std::string line = "let x;";
     //std::string line = "print(x);";
     // TEST CHAINED EXPRESSIONS AGAIN because you moved variable creation to loop
-    std::string line = "print(4+2);";
+    //std::string line = "print(4+2);";
+    std::string line = "x = y;";
     Lexer lexer(line);
     std::vector<Token> tokens = lexer.identify();
 

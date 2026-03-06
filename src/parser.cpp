@@ -7,6 +7,7 @@ nodeType(nodeType), value(value), left(left), right(right) {};
 
 Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens), currIndex_(0) {}; 
 
+// Implement some vector to store those nodes
 ASTNode* Parser::parseProgram() {
     ASTNode* statementNode = nullptr;
     while(tokens_[currIndex_].type != TokenType::ENDOFFILE) {
@@ -28,10 +29,10 @@ ASTNode* Parser::parseStatement() {
             if(match(TokenType::EQUALS)) {
                 advance();
                 ASTNode* expressionNode = parseExpression();
-                return new ASTNode(NodeType::VarDecl, variableToken.value, expressionNode, nullptr);
+                return new ASTNode(NodeType::VarDecl, variableToken.value, expressionNode);
             }
             else {
-                return new ASTNode(NodeType::VarDecl, variableToken.value, nullptr, nullptr);
+                return new ASTNode(NodeType::VarDecl, variableToken.value);
             }      
         }
         else throw std::runtime_error("Expected variable declaration but got: " + tokens_[currIndex_].value);
@@ -45,23 +46,22 @@ ASTNode* Parser::parseStatement() {
                 throw std::runtime_error("Missing closing paren");
             }
             advance();
-            return new ASTNode(NodeType::Print, "Print", node, nullptr);
+            return new ASTNode(NodeType::Print, "", node);
         }
         throw std::runtime_error("Missing open paren");
     }
-    // case for assigment, like x = 10;
     else if(match(TokenType::VARIABLE)) {
-
+        Token token = tokens_[currIndex_];
         advance();
         if(match(TokenType::EQUALS)) {
-
+            advance();
+            ASTNode* node = parseExpression();
+            return new ASTNode(NodeType::Assignment, token.value, node);
         }
-
+        throw std::runtime_error("Expected variable assigment but got: " + tokens_[currIndex_].value);
     }
-    
-    return nullptr;
+    throw std::runtime_error("Unexpected statement: " + tokens_[currIndex_].value);
 }
-
 
 ASTNode* Parser::parseExpression() {
     ASTNode* left = parseTerm(); 
@@ -89,7 +89,6 @@ ASTNode* Parser::parseTerm() {
     return left;
 }
 
-
 ASTNode* Parser::parseFactor() {
     if(match(TokenType::NUMBER)) {
         ASTNode* node = new ASTNode(NodeType::Number, tokens_[currIndex_].value); 
@@ -112,7 +111,6 @@ ASTNode* Parser::parseFactor() {
     }
     throw std::runtime_error("Unexpected token: " + tokens_[currIndex_].value);
 }
-
 
 bool Parser::match(TokenType type) {
     if(currIndex_ >= tokens_.size()) {
