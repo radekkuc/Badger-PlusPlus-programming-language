@@ -5,19 +5,21 @@
 ASTNode::ASTNode(NodeType nodeType, const std::string& value, ASTNode* left, ASTNode* right) : 
 nodeType(nodeType), value(value), left(left), right(right) {};
 
-Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens), currIndex_(0) {}; 
+Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens) {}; 
 
 // Implement some vector to store those nodes
-ASTNode* Parser::parseProgram() {
+std::vector<ASTNode*> Parser::parseProgram() {
     ASTNode* statementNode = nullptr;
+    std::vector<ASTNode*> nodes{};
     while(tokens_[currIndex_].type != TokenType::ENDOFFILE) {
         statementNode = parseStatement();
         if(!match(TokenType::SEMICOLON)) {
             throw std::runtime_error("Missing ; at the end");
         } 
         else advance();
+        nodes.emplace_back(statementNode);
     }
-    return statementNode;
+    return nodes;
 } 
 
 ASTNode* Parser::parseStatement() {
@@ -138,5 +140,14 @@ void Parser::printAST(ASTNode* node, int depth) {
     if (node->right) {
         std::cout << std::string(depth * 2, ' ') << "Right: \n";
         printAST(node->right, depth + 1);
+    }
+}
+
+void Parser::printAST(const std::vector<ASTNode*>& nodes) {
+    std::cout << "Program AST:\n";
+
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        std::cout << "\nStatement " << i + 1 << ":\n";
+        printAST(nodes[i], 1);
     }
 }

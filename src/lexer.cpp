@@ -2,7 +2,7 @@
 #include "lexer.h"
 #include <stdexcept>
 
-Lexer::Lexer(const std::string& line) : line_(line), currIndex_(0) {};
+Lexer::Lexer(const std::string& line) : line_{line}, currIndex_{0} {};
 
 std::vector<Token> Lexer::identify() {
     std::vector<Token> tokens;

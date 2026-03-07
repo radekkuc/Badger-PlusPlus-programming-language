@@ -20,7 +20,7 @@ int main(int, char**){
     //     std::cout << token.value << std::endl;
     // }
     Parser parser(tokens);
-    ASTNode* node = parser.parseProgram();
+    std::vector<ASTNode*> nodes = parser.parseProgram();
     std::cout << "Using printing method\n"; 
-    parser.printAST(node);
+    parser.printAST(nodes);
 }

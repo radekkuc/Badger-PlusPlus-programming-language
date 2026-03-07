@@ -18,8 +18,8 @@ struct Token {
 
 class Lexer {
 private:
-    std::string line_;
     size_t currIndex_;
+    std::string line_;
 public:
     explicit Lexer(const std::string& line);
 

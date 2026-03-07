@@ -1,5 +1,6 @@
 #pragma once
 #include "lexer.h"
+#include <memory>
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Assignment,
@@ -23,7 +24,7 @@ private:
 
 public:
     explicit Parser(const std::vector<Token>& tokens);
-    ASTNode* parseProgram(); // parsing whole program into AST
+    std::vector<ASTNode*> parseProgram(); // parsing whole program into AST
     ASTNode* parseStatement(); // parsing statements like let, print
     ASTNode* parseExpression(); // adds/subtracts factors
     ASTNode* parseTerm(); // divides/multiplies factors
@@ -31,4 +32,5 @@ public:
     bool match(TokenType type);
     void advance();
     void printAST(ASTNode* node, int depth = 0);
+    void printAST(const std::vector<ASTNode*>& nodes);
 };
