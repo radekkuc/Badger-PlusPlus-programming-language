@@ -7,7 +7,6 @@ nodeType(nodeType), value(value), left(left), right(right) {};
 
 Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens) {}; 
 
-// Implement some vector to store those nodes
 std::vector<ASTNode*> Parser::parseProgram() {
     ASTNode* statementNode = nullptr;
     std::vector<ASTNode*> nodes{};

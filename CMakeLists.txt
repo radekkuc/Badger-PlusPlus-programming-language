@@ -4,6 +4,7 @@ project(Badger++ VERSION 0.1.0 LANGUAGES C CXX)
 add_executable(Badger++ main.cpp
     src/lexer.cpp
     src/parser.cpp
+    src/compiler.cpp
 )
 
 include_directories(include)
