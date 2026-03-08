@@ -4,15 +4,10 @@
 
 
 int main(int, char**){
-    //std::string line = "let x = 10;";
-    //std::string line = "let x = 10 + 5 + 2;";
-    //std::string line = "let x = 10 * 2 + 4;";
-    //std::string line = "let x = 2 + 6 * (4 / 2) - 3;";
-    //std::string line = "let x;";
-    //std::string line = "print(x);";
-    // TEST CHAINED EXPRESSIONS AGAIN because you moved variable creation to loop
-    //std::string line = "print(4+2);";
-    std::string line = "x = y;";
+    std::string line = R"(let x = 10;
+    print(x);
+    x = x + 1;
+    print(x);)";
     Lexer lexer(line);
     std::vector<Token> tokens = lexer.identify();
 
@@ -21,6 +16,9 @@ int main(int, char**){
     // }
     Parser parser(tokens);
     std::vector<ASTNode*> nodes = parser.parseProgram();
+    // for(const auto& node : nodes) {
+    //     std::cout << node->value << std::endl;
+    // }
     std::cout << "Using printing method\n"; 
     parser.printAST(nodes);
 }
