@@ -4,8 +4,8 @@
 
 // Operation code
 enum class OpCode : uint8_t {
-    STORE, LOAD,
-    PRINT,
+    STORE, LOAD, PRINT,
+    CONSTANT, VARIABLE, 
     ADD, SUB, DIV, MUL
 };
 
@@ -20,5 +20,6 @@ private:
     std::vector<Instruction> bytecode;
     std::unordered_map<int, std::string> variables;
 public:
-    void compile(const std::vector<ASTNode*> nodes);
+    void compileNode(ASTNode* node);
+    void compileProgram(const std::vector<ASTNode*>& nodes);
 };
