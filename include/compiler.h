@@ -26,4 +26,6 @@ private:
 public:
     Compiler(const std::vector<ASTNode*>& nodes);
     void compileProgram();
+    void dumpBytecode() const;
+    static std::string opcodeToString(OpCode op);
 };

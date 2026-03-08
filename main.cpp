@@ -1,12 +1,13 @@
 #include <iostream>
-#include "lexer.h"
-#include "parser.h"
+#include "compiler.h"
 
 
 int main(int, char**){
-    std::string line = R"(let x = 10;
+    std::string line = R"(let x;
     print(x);
-    x = x + 1;
+    let y = 15;
+    let z = 20;
+    x = y + z;
     print(x);)";
     Lexer lexer(line);
     std::vector<Token> tokens = lexer.identify();
@@ -19,6 +20,10 @@ int main(int, char**){
     // for(const auto& node : nodes) {
     //     std::cout << node->value << std::endl;
     // }
-    std::cout << "Using printing method\n"; 
-    parser.printAST(nodes);
+    // std::cout << "Using printing method\n"; 
+    // parser.printAST(nodes);
+
+    Compiler compiler(nodes);
+    compiler.compileProgram();
+    compiler.dumpBytecode();
 }
