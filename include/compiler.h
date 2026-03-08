@@ -11,15 +11,19 @@ enum class OpCode : uint8_t {
 
 struct Instruction {
     OpCode opcode;
-    int operand;
+    int operand = 0;
 };
 
 
 class Compiler {
 private:
+    int variableCount;
+    std::vector<ASTNode*> nodes_;
     std::vector<Instruction> bytecode;
-    std::unordered_map<int, std::string> variables;
-public:
+    std::unordered_map<std::string, int> variableTable;
+
     void compileNode(ASTNode* node);
-    void compileProgram(const std::vector<ASTNode*>& nodes);
+public:
+    Compiler(const std::vector<ASTNode*>& nodes);
+    void compileProgram();
 };
