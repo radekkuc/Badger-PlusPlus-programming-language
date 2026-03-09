@@ -5,6 +5,7 @@ add_executable(Badger++ main.cpp
     src/lexer.cpp
     src/parser.cpp
     src/compiler.cpp
+    src/interpreter.cpp
 )
 
 include_directories(include)

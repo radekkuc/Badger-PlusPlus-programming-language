@@ -8,14 +8,22 @@ void Compiler::compileNode(ASTNode* node) {
     switch(node->nodeType) {
         case NodeType::VarDecl:
         if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
+        if(node->left == nullptr) {
+            bytecode.push_back({OpCode::STORE, variableCount});
+            variableTable[node->value] = variableCount;
+            variableCount++;    
+            break;
+        }
+        variableTable[node->value] = variableCount;
         compileNode(node->left);
         bytecode.push_back({OpCode::STORE, variableCount});
+
         if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-        variableTable[node->value] = variableCount;
         variableCount++;
         break;
 
         case NodeType::Print:
+        if(node->left->left == nullptr) throw std::runtime_error("Using uninitialised variable: " + node->left->value);
         compileNode(node->left);
         bytecode.push_back({OpCode::PRINT});
         break;
