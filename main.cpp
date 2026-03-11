@@ -5,11 +5,11 @@
 int main(int, char**){
     try {
         std::string line = R"(let x;
-        print(x);
+        x = 10;
         let y = 15;
         let z = 20;
-        x = y + z;
-        print(x);)";
+        print(x);
+        )";
         // std::string line = R"( let x = 10;
         // let y = 5;
         // let z = x + y;
@@ -33,7 +33,12 @@ int main(int, char**){
 
         Compiler compiler(nodes);
         compiler.compileProgram();
+        std::unordered_map<std::string, int> variableMap = compiler.getMap();
         compiler.dumpBytecode();
+
+        for(const auto& pair : variableMap) {
+            std::cout << pair.first << "," << pair.second << std::endl; 
+        }
 
     }
     catch(const std::exception& e) {

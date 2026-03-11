@@ -9,21 +9,22 @@ void Compiler::compileNode(ASTNode* node) {
         case NodeType::VarDecl:
         if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
         if(node->left == nullptr) {
-            bytecode.push_back({OpCode::STORE, variableCount});
+            //bytecode.push_back({OpCode::STORE, variableCount});
             variableTable[node->value] = variableCount;
+            initialised[node->value] = false;
             variableCount++;    
             break;
         }
         variableTable[node->value] = variableCount;
         compileNode(node->left);
         bytecode.push_back({OpCode::STORE, variableCount});
+        initialised[node->value] = true;
 
         if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
         variableCount++;
         break;
 
         case NodeType::Print:
-        if(node->left->left == nullptr) throw std::runtime_error("Using uninitialised variable: " + node->left->value);
         compileNode(node->left);
         bytecode.push_back({OpCode::PRINT});
         break;
@@ -32,6 +33,7 @@ void Compiler::compileNode(ASTNode* node) {
         compileNode(node->left);
         if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
         bytecode.push_back({OpCode::STORE, variableTable[node->value]});
+        initialised[node->value] = true;
         break;
 
         case NodeType::Number:
@@ -40,6 +42,7 @@ void Compiler::compileNode(ASTNode* node) {
 
         case NodeType::Variable:
         if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+        if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
         bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
         break;
 
@@ -121,4 +124,10 @@ void Compiler::dumpBytecode() const {
     }
 
     std::cout << "\nVariable count: " << variableCount << "\n";
+}
+
+
+
+std::unordered_map<std::string, int> Compiler::getMap() const {
+    return variableTable;
 }

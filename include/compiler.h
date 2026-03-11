@@ -21,11 +21,13 @@ private:
     std::vector<ASTNode*> nodes_;
     std::vector<Instruction> bytecode;
     std::unordered_map<std::string, int> variableTable;
+    std::unordered_map<std::string, bool> initialised;
 
     void compileNode(ASTNode* node);
 public:
     Compiler(const std::vector<ASTNode*>& nodes);
     void compileProgram();
     void dumpBytecode() const;
+    std::unordered_map<std::string, int> getMap() const;
     static std::string opcodeToString(OpCode op);
 };
