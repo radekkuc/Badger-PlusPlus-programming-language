@@ -7,71 +7,71 @@ Compiler::Compiler(const std::vector<ASTNode*>& nodes) : variableCount{}, nodes_
 void Compiler::compileNode(ASTNode* node) {
     switch(node->nodeType) {
         case NodeType::VarDecl:
-        if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
-        if(node->left == nullptr) {
-            //bytecode.push_back({OpCode::STORE, variableCount});
+            if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
+            if(node->left == nullptr) {
+                //bytecode.push_back({OpCode::STORE, variableCount});
+                variableTable[node->value] = variableCount;
+                initialised[node->value] = false;
+                variableCount++;    
+                break;
+            }
             variableTable[node->value] = variableCount;
-            initialised[node->value] = false;
-            variableCount++;    
-            break;
-        }
-        variableTable[node->value] = variableCount;
-        compileNode(node->left);
-        bytecode.push_back({OpCode::STORE, variableCount});
-        initialised[node->value] = true;
+            compileNode(node->left);
+            bytecode.push_back({OpCode::STORE, variableCount});
+            initialised[node->value] = true;
 
-        if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-        variableCount++;
-        break;
+            if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+            variableCount++;
+            break;
 
         case NodeType::Print:
-        compileNode(node->left);
-        bytecode.push_back({OpCode::PRINT});
-        break;
+            compileNode(node->left);
+            bytecode.push_back({OpCode::PRINT});
+            break;
 
         case NodeType::Assignment:
-        compileNode(node->left);
-        if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-        bytecode.push_back({OpCode::STORE, variableTable[node->value]});
-        initialised[node->value] = true;
-        break;
+            compileNode(node->left);
+            if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+            bytecode.push_back({OpCode::STORE, variableTable[node->value]});
+            initialised[node->value] = true;
+            break;
 
         case NodeType::Number:
-        bytecode.push_back({OpCode::CONSTANT, stoi(node->value)});
-        break;
+            bytecode.push_back({OpCode::CONSTANT, stoi(node->value)});
+            break;
 
         case NodeType::Variable:
-        if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-        if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
-        bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
-        break;
+            if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+            if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
+            bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
+            break;
 
         case NodeType::Plus:
-        compileNode(node->left);
-        compileNode(node->right);
-        bytecode.push_back({OpCode::ADD});
-        break;
+            compileNode(node->left);
+            compileNode(node->right);
+            bytecode.push_back({OpCode::ADD});
+            break;
 
         case NodeType::Minus:
-        compileNode(node->left);
-        compileNode(node->right);
-        bytecode.push_back({OpCode::SUB});
-        break;
+            compileNode(node->left);
+            compileNode(node->right);
+            bytecode.push_back({OpCode::SUB});
+            break;
 
         case NodeType::Asterisk:
-        compileNode(node->left);
-        compileNode(node->right);
-        bytecode.push_back({OpCode::MUL});
-        break;
+            compileNode(node->left);
+            compileNode(node->right);
+            bytecode.push_back({OpCode::MUL});
+            break;
 
         case NodeType::Slash:
-        compileNode(node->left);
-        compileNode(node->right);
-        bytecode.push_back({OpCode::DIV});
-        break;
+            compileNode(node->left);
+            compileNode(node->right);
+            bytecode.push_back({OpCode::DIV});
+            break;
 
         default:
-        break;
+            break;
     }
 }
 

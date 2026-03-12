@@ -10,60 +10,60 @@ std::vector<Token> Lexer::identify() {
         char c = line_[currIndex_];
         switch(c) {
             case '*':
-            tokens.push_back(Token{TokenType::ASTERISK, "*"});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::ASTERISK, "*"});
+                currIndex_++;
+                break;
 
             case '/':
-            tokens.push_back(Token{TokenType::SLASH, "/"});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::SLASH, "/"});
+                currIndex_++;
+                break;
 
             case '+':
-            tokens.push_back(Token{TokenType::PLUS, "+"}); 
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::PLUS, "+"}); 
+                currIndex_++;
+                break;
 
             case '-':
-            tokens.push_back(Token{TokenType::MINUS, "-"});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::MINUS, "-"});
+                currIndex_++;
+                break;
 
             case '(':
-            tokens.push_back(Token{TokenType::LPAREN, "("});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::LPAREN, "("});
+                currIndex_++;
+                break;
 
             case ')':
-            tokens.push_back(Token{TokenType::RPAREN, ")"});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::RPAREN, ")"});
+                currIndex_++;
+                break;
 
             case '=':
-            tokens.push_back(Token{TokenType::EQUALS, "="});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::EQUALS, "="});
+                currIndex_++;
+                break;
 
             case ';':
-            tokens.push_back(Token{TokenType::SEMICOLON, ";"});
-            currIndex_++;
-            break;
+                tokens.push_back(Token{TokenType::SEMICOLON, ";"});
+                currIndex_++;
+                break;
 
             default:
-            if(isspace(c)) skipWhiteSpace();
-            else if(line_.substr(currIndex_, 3) == "let") {
-                tokens.push_back(Token{TokenType::LET, "let"});
-                currIndex_ += 3; 
-            }
-            else if(line_.substr(currIndex_, 5) == "print") {
-                tokens.push_back(Token{TokenType::PRINT, "print"});
-                currIndex_ += 5;
-            }
-    
-            else if(isalpha(c)) tokens.push_back(readWord()); 
-            else if(isdigit(c)) tokens.push_back(readNumber());
-            else throw std::runtime_error("Unknown character provided: " + c);
-            break;
+                if(isspace(c)) skipWhiteSpace();
+                else if(line_.substr(currIndex_, 3) == "let") {
+                    tokens.push_back(Token{TokenType::LET, "let"});
+                    currIndex_ += 3; 
+                }
+                else if(line_.substr(currIndex_, 5) == "print") {
+                    tokens.push_back(Token{TokenType::PRINT, "print"});
+                    currIndex_ += 5;
+                }
+        
+                else if(isalpha(c)) tokens.push_back(readWord()); 
+                else if(isdigit(c)) tokens.push_back(readNumber());
+                else throw std::runtime_error("Unknown character provided: " + c);
+                break;
         }   
     }
     tokens.push_back(Token{TokenType::ENDOFFILE, "EOF"});   
