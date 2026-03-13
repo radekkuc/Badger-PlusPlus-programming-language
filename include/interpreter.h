@@ -11,7 +11,7 @@ class Interpreter {
 private:
     using Value = std::variant<int, std::string, float, char, double>;
     std::vector<Value> variables;
-    std::stack<Value> stack;
+    std::vector<Value> stack;
     std::vector<Instruction> byteCode_;
 public:
     void run();
