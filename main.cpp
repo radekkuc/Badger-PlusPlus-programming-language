@@ -1,19 +1,15 @@
 #include <iostream>
-#include "compiler.h"
-
+#include "interpreter.h"
 
 int main(int, char**){
     try {
-        std::string line = R"(let x;
-        x = 10;
-        let y = 15;
-        let z = 20;
+        std::string line = R"(let x = 10 + 5;
+        let y;
+        y = x;
+        print(y);
         print(x);
         )";
-        // std::string line = R"( let x = 10;
-        // let y = 5;
-        // let z = x + y;
-        // print(z);)";
+
         Lexer lexer(line);
         
         std::vector<Token> tokens = lexer.identify();
@@ -36,9 +32,14 @@ int main(int, char**){
         std::unordered_map<std::string, int> variableMap = compiler.getMap();
         compiler.dumpBytecode();
 
-        for(const auto& pair : variableMap) {
-            std::cout << pair.first << "," << pair.second << std::endl; 
-        }
+        // for(const auto& pair : variableMap) {
+        //     std::cout << pair.first << "," << pair.second << std::endl; 
+        // }
+
+        std::vector<Instruction> byteCode = compiler.getByteCode();
+        int variableCount = compiler.getVariableCount();
+        Interpreter interpreter(byteCode, variableCount);
+        interpreter.run();
 
     }
     catch(const std::exception& e) {

@@ -28,6 +28,8 @@ public:
     Compiler(const std::vector<ASTNode*>& nodes);
     void compileProgram();
     void dumpBytecode() const;
+    std::vector<Instruction> getByteCode() const;
+    int getVariableCount() const;
     std::unordered_map<std::string, int> getMap() const;
     static std::string opcodeToString(OpCode op);
 };

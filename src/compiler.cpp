@@ -131,3 +131,11 @@ void Compiler::dumpBytecode() const {
 std::unordered_map<std::string, int> Compiler::getMap() const {
     return variableTable;
 }
+
+std::vector<Instruction> Compiler::getByteCode() const {
+    return bytecode;
+}
+
+int Compiler::getVariableCount() const {
+    return variableCount;
+}
