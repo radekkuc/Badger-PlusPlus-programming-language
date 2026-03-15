@@ -1,6 +1,8 @@
 #include <iostream>
 #include "lexer.h"
 #include <stdexcept>
+#include <sstream>
+#include <fstream>
 
 Lexer::Lexer(const std::string& line) : line_{line}, currIndex_{0} {};
 

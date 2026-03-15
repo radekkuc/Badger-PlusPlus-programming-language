@@ -1,16 +1,18 @@
 #include <iostream>
 #include "interpreter.h"
+#include <sstream>
+#include <fstream>
 
-int main(int, char**){
+int main(int argc, char** argv){
     try {
-        std::string line = R"(let x = 10 + 5;
-        let y;
-        y = x;
-        print(y);
-        print(x);
-        )";
+        std::ifstream file(argv[1]);
+        if(argc < 2) throw std::runtime_error("No file provided");
 
-        Lexer lexer(line);
+        std::stringstream ss;
+        ss << file.rdbuf();
+        const std::string& code = ss.str();
+
+        Lexer lexer(code);
         
         std::vector<Token> tokens = lexer.identify();
 

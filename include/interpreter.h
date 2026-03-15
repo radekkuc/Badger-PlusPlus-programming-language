@@ -5,8 +5,6 @@
 #include <stack>
 
 
-
-
 class Interpreter {
 private:
     using Value = std::variant<int, std::string, float, char, double>;
@@ -15,6 +13,6 @@ private:
     std::vector<Instruction> byteCode_;
 public:
     void run();
-    Interpreter(const std::vector<Instruction>& byteCode, int variableCount);
+    explicit Interpreter(const std::vector<Instruction>& byteCode, int variableCount);
 
 };

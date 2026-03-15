@@ -25,7 +25,7 @@ private:
 
     void compileNode(ASTNode* node);
 public:
-    Compiler(const std::vector<ASTNode*>& nodes);
+    explicit Compiler(const std::vector<ASTNode*>& nodes);
     void compileProgram();
     void dumpBytecode() const;
     std::vector<Instruction> getByteCode() const;
