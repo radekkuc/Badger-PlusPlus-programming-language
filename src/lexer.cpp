@@ -64,6 +64,7 @@ std::vector<Token> Lexer::identify() {
         
                 else if(isalpha(c)) tokens.push_back(readWord()); 
                 else if(isdigit(c)) tokens.push_back(readNumber());
+                // there can be additional if statement which checks if something starts with " and also ends with it
                 else throw std::runtime_error("Unknown character provided: " + c);
                 break;
         }   
@@ -80,6 +81,7 @@ void Lexer::skipWhiteSpace() {
 
 Token Lexer::readNumber() {
     std::string number;
+    // maybe make some distinction of numbers here with if statements
     while(isdigit(line_[currIndex_]) && currIndex_ < line_.size()) {
         number += line_[currIndex_];
         currIndex_++;
@@ -89,6 +91,7 @@ Token Lexer::readNumber() {
 
 Token Lexer::readWord() {
     std::string variable;
+    // also add some distinction, if word true or false appears then this is a boolean value
     while(isalpha(line_[currIndex_]) && currIndex_ < line_.size()) {
         variable += line_[currIndex_];
         currIndex_++;
