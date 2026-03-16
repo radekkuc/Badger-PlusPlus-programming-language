@@ -1,5 +1,5 @@
-let x = 10;
-let y = 10 + 10;
-let z = x + y;
-print(z);
-print(y);
+let x = 3.14;
+let y = 10;
+let s = true;
+let word = "word";
+

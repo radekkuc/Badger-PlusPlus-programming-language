@@ -64,7 +64,7 @@ std::vector<Token> Lexer::identify() {
         
                 else if(isalpha(c)) tokens.push_back(readWord()); 
                 else if(isdigit(c)) tokens.push_back(readNumber());
-                // there can be additional if statement which checks if something starts with " and also ends with it
+                else if(c == '"') tokens.push_back(readString());
                 else throw std::runtime_error("Unknown character provided: " + c);
                 break;
         }   
@@ -78,23 +78,43 @@ void Lexer::skipWhiteSpace() {
         currIndex_++;
     }
 }
-
+// 32..14
 Token Lexer::readNumber() {
     std::string number;
-    // maybe make some distinction of numbers here with if statements
-    while(isdigit(line_[currIndex_]) && currIndex_ < line_.size()) {
-        number += line_[currIndex_];
+    bool hasDot = false;
+    while(currIndex_ < line_.size()) {
+        if(isdigit(line_[currIndex_])) {
+            number += line_[currIndex_];
+        }
+        else if(line_[currIndex_] == '.' && !hasDot) {
+            number += line_[currIndex_];
+            hasDot = true;
+        }
+        else break; 
         currIndex_++;
     }
+    if(line_[currIndex_] == '.') throw std::runtime_error(std::string("Unexpected symbol in number definition: ")  + line_[currIndex_]);
     return Token{TokenType::NUMBER, number};
 }
 
 Token Lexer::readWord() {
     std::string variable;
-    // also add some distinction, if word true or false appears then this is a boolean value
     while(isalpha(line_[currIndex_]) && currIndex_ < line_.size()) {
         variable += line_[currIndex_];
         currIndex_++;
     }
+    if(variable == "true" || variable == "false") return Token{TokenType::BOOL, variable};
     return Token{TokenType::VARIABLE, variable};
+}
+
+Token Lexer::readString() {
+    std::string strVar;
+    currIndex_++;
+    while(line_[currIndex_] != '"' && currIndex_ < line_.size()) {
+        strVar += line_[currIndex_];
+        currIndex_++;
+    }
+    if(line_[currIndex_] != '"') throw std::runtime_error("Missing closing \" for string");
+    currIndex_++;
+    return Token{TokenType::STRING, strVar};
 }

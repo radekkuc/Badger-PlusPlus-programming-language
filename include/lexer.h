@@ -25,6 +25,7 @@ public:
     explicit Lexer(const std::string& line);
 
     std::vector<Token> identify();
+    Token readString();
     Token readNumber();
     Token readWord();
 
