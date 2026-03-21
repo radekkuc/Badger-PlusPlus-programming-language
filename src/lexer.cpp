@@ -53,14 +53,14 @@ std::vector<Token> Lexer::identify() {
 
             default:
                 if(isspace(c)) skipWhiteSpace();
-                else if(line_.substr(currIndex_, 3) == "let") {
-                    tokens.push_back(Token{TokenType::LET, "let"});
-                    currIndex_ += 3; 
-                }
-                else if(line_.substr(currIndex_, 5) == "print") {
-                    tokens.push_back(Token{TokenType::PRINT, "print"});
-                    currIndex_ += 5;
-                }
+                // else if(line_.substr(currIndex_, 3) == "let") {
+                //     tokens.push_back(Token{TokenType::LET, "let"});
+                //     currIndex_ += 3; 
+                // }
+                // else if(line_.substr(currIndex_, 5) == "print") {
+                //     tokens.push_back(Token{TokenType::PRINT, "print"});
+                //     currIndex_ += 5;
+                // }
         
                 else if(isalpha(c)) tokens.push_back(readWord()); 
                 else if(isdigit(c)) tokens.push_back(readNumber());
@@ -103,6 +103,8 @@ Token Lexer::readWord() {
         variable += line_[currIndex_];
         currIndex_++;
     }
+    if(variable == "let") return Token{TokenType::LET, variable};
+    if(variable == "print") return Token{TokenType::PRINT, variable};
     if(variable == "true" || variable == "false") return Token{TokenType::BOOL, variable};
     return Token{TokenType::VARIABLE, variable};
 }

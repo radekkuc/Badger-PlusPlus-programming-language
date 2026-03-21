@@ -1,5 +1,8 @@
 let x = 3.14;
 let y = 10;
+let letter = "test";
 let s = true;
 let word = "word";
 
+print(s);
+print(letter);
