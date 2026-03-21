@@ -23,14 +23,14 @@ int main(int argc, char** argv){
         Parser parser(tokens);
         std::vector<ASTNode*> nodes = parser.parseProgram();
 
-        for(const auto& node : nodes) {
-            std::cout << node->value  << "," << node->left->value << std::endl;
-        }
+        // for(const auto& node : nodes) {
+        //     std::cout << node->value  << "," << node->left->value << std::endl;
+        // }
         // std::cout << "Using printing method\n"; 
         // parser.printAST(nodes);
 
-        // Compiler compiler(nodes);
-        // compiler.compileProgram();
+        Compiler compiler(nodes);
+        compiler.compileProgram();
         // std::unordered_map<std::string, int> variableMap = compiler.getMap();
         // compiler.dumpBytecode();
 
@@ -38,10 +38,15 @@ int main(int argc, char** argv){
         //     std::cout << pair.first << "," << pair.second << std::endl; 
         // }
 
-    //     std::vector<Instruction> byteCode = compiler.getByteCode();
-    //     int variableCount = compiler.getVariableCount();
-    //     Interpreter interpreter(byteCode, variableCount);
-    //     interpreter.run();
+        std::vector<Instruction> byteCode = compiler.getByteCode();
+        std::vector<Value> constants = compiler.getConstants();
+        // for (const auto& constant : constants) {
+        //     std::visit([](const auto& v) {
+        //     std::cout << v << std::endl;
+        //     }, constant);
+        // }
+        Interpreter interpreter(byteCode, constants);
+        interpreter.run();
     }
     catch(const std::exception& e) {
         std::cerr << "Exception has occurred: " << e.what() << std::endl; 

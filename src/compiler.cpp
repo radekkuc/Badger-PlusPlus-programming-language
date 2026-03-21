@@ -9,7 +9,6 @@ void Compiler::compileNode(ASTNode* node) {
         case NodeType::VarDecl:
             if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
             if(node->left == nullptr) {
-                //bytecode.push_back({OpCode::STORE, variableCount});
                 variableTable[node->value] = variableCount;
                 initialised[node->value] = false;
                 variableCount++;    
@@ -37,13 +36,34 @@ void Compiler::compileNode(ASTNode* node) {
             break;
 
         case NodeType::Number:
-            bytecode.push_back({OpCode::CONSTANT, stoi(node->value)});
+            {
+            Value val;
+            if(node->value.find('.') != std::string::npos) {
+                val = std::stof(node->value);
+            } 
+            else {
+                val = std::stoi(node->value);
+
+            }
+            constants.push_back(val);
+            bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
             break;
+            }
 
         case NodeType::Variable:
             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
             if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
             bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
+            break;
+        
+        case NodeType::String:
+            constants.push_back(node->value);
+            bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
+            break;
+            
+        case NodeType::Bool:
+            constants.push_back(node->value);
+            bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
             break;
 
         case NodeType::Plus:
@@ -69,7 +89,6 @@ void Compiler::compileNode(ASTNode* node) {
             compileNode(node->right);
             bytecode.push_back({OpCode::DIV});
             break;
-
         default:
             break;
     }
@@ -136,6 +155,7 @@ std::vector<Instruction> Compiler::getByteCode() const {
     return bytecode;
 }
 
-int Compiler::getVariableCount() const {
-    return variableCount;
+
+std::vector<Value> Compiler::getConstants() const {
+    return constants;
 }

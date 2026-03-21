@@ -1,7 +1,7 @@
 #include "interpreter.h"
 #include <iostream>
 
-Interpreter::Interpreter(const std::vector<Instruction>& byteCode, int variableCount) : byteCode_(byteCode) { variables.resize(variableCount); } 
+Interpreter::Interpreter(const std::vector<Instruction>& byteCode, const std::vector<Value>& constants) : byteCode_(byteCode), variables(constants) {};
 
 void Interpreter::run() {
     size_t index = 0;
@@ -9,7 +9,7 @@ void Interpreter::run() {
         switch(byteCode_[index].opcode) {
             case OpCode::CONSTANT:
             {
-                stack.push_back(byteCode_[index].operand);
+                stack.push_back(variables[byteCode_[index].operand]);
                 break;
             }
             case OpCode::STORE:
