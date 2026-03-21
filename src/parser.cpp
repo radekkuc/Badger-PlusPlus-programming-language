@@ -91,6 +91,7 @@ ASTNode* Parser::parseTerm() {
 }
 
 ASTNode* Parser::parseFactor() {
+    //std::cout << "What is the value here "<< tokenType(tokens_[currIndex_].type) << " " <<  tokens_[currIndex_].value << std::endl;
     if(match(TokenType::NUMBER)) {
         ASTNode* node = new ASTNode(NodeType::Number, tokens_[currIndex_].value); 
         advance();
@@ -110,6 +111,19 @@ ASTNode* Parser::parseFactor() {
         advance(); 
         return node; 
     }
+
+    if(match(TokenType::BOOL)) {
+        ASTNode* node = new ASTNode(NodeType::Bool, tokens_[currIndex_].value);
+        advance();
+        return node;
+    }
+
+    if(match(TokenType::STRING)) {
+        ASTNode* node = new ASTNode(NodeType::String, tokens_[currIndex_].value);
+        advance();
+        return node;
+    }
+
     throw std::runtime_error("Unexpected token: " + tokens_[currIndex_].value);
 }
 
@@ -149,4 +163,29 @@ void Parser::printAST(const std::vector<ASTNode*>& nodes) {
         std::cout << "\nStatement " << i + 1 << ":\n";
         printAST(nodes[i], 1);
     }
+}
+
+
+const char* Parser::tokenType(TokenType type) {
+    switch(type) {
+        case TokenType::ASTERISK:   return "ASTERISK";
+        case TokenType::SLASH:      return "SLASH";
+        case TokenType::PLUS:       return "PLUS";
+        case TokenType::MINUS:      return "MINUS";
+        case TokenType::LPAREN:     return "LPAREN";
+        case TokenType::RPAREN:     return "RPAREN";
+        case TokenType::EQUALS:     return "EQUALS";
+        case TokenType::SEMICOLON:  return "SEMICOLON";
+
+        case TokenType::NUMBER:     return "NUMBER";
+        case TokenType::VARIABLE:   return "VARIABLE";
+        case TokenType::ENDOFFILE:  return "ENDOFFILE";
+
+        case TokenType::STRING:     return "STRING";
+        case TokenType::BOOL:       return "BOOL";
+
+        case TokenType::LET:        return "LET";
+        case TokenType::PRINT:      return "PRINT";
+    }
+    return "UNKNOWN";
 }

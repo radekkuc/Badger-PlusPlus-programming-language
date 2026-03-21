@@ -53,15 +53,6 @@ std::vector<Token> Lexer::identify() {
 
             default:
                 if(isspace(c)) skipWhiteSpace();
-                // else if(line_.substr(currIndex_, 3) == "let") {
-                //     tokens.push_back(Token{TokenType::LET, "let"});
-                //     currIndex_ += 3; 
-                // }
-                // else if(line_.substr(currIndex_, 5) == "print") {
-                //     tokens.push_back(Token{TokenType::PRINT, "print"});
-                //     currIndex_ += 5;
-                // }
-        
                 else if(isalpha(c)) tokens.push_back(readWord()); 
                 else if(isdigit(c)) tokens.push_back(readNumber());
                 else if(c == '"') tokens.push_back(readString());
@@ -78,7 +69,7 @@ void Lexer::skipWhiteSpace() {
         currIndex_++;
     }
 }
-// 32..14
+
 Token Lexer::readNumber() {
     std::string number;
     bool hasDot = false;
