@@ -25,9 +25,11 @@ void Interpreter::run() {
             }
             case OpCode::PRINT:
             { 
-                int value = std::get<int>(stack.back());
+                Value value = stack.back();
+                std::visit([](const auto& val) {
+                    std::cout << val;
+                }, value);
                 stack.pop_back();
-                std::cout << value;
                 break;
             }
             case OpCode::ADD:
@@ -64,4 +66,14 @@ void Interpreter::run() {
         }
         index++;
     }
+}
+
+
+void Interpreter::add(Value a, Value b) {
+    std::visit([](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        //if constexpr(is_numeric_v<)
+    }, a, b);
 }

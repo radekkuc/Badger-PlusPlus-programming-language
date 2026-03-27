@@ -13,6 +13,7 @@ private:
     std::vector<Instruction> byteCode_;
 public:
     void run();
+    void add(Value a, Value b);
     explicit Interpreter(const std::vector<Instruction>& byteCode, const std::vector<Value>& constants);
 
 };

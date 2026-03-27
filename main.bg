@@ -1,6 +1,6 @@
-let z = 10;
-let y = 15 + 25;
-let x = z + y;
-print(z);
+let x = 10;
+let y = "word";
+let z = 10.5;
 print(y);
+print(" ");
 print(x);
