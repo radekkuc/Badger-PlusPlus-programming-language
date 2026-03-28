@@ -31,20 +31,21 @@ int main(int argc, char** argv){
 
         Compiler compiler(nodes);
         compiler.compileProgram();
-        // std::unordered_map<std::string, int> variableMap = compiler.getMap();
-        // compiler.dumpBytecode();
+        std::unordered_map<std::string, int> variableMap = compiler.getMap();
+        compiler.dumpBytecode();
 
-        // for(const auto& pair : variableMap) {
-        //     std::cout << pair.first << "," << pair.second << std::endl; 
-        // }
+        for(const auto& pair : variableMap) {
+            std::cout << pair.first << "," << pair.second << std::endl; 
+        }
 
         std::vector<Instruction> byteCode = compiler.getByteCode();
         std::vector<Value> constants = compiler.getConstants();
-        // for (const auto& constant : constants) {
-        //     std::visit([](const auto& v) {
-        //     std::cout << v << std::endl;
-        //     }, constant);
-        // }
+        for (const auto& constant : constants) {
+            std::visit([](const auto& v) {
+            std::cout << "Constants\n";
+            std::cout << v << std::endl;
+            }, constant);
+        }
         Interpreter interpreter(byteCode, constants);
         interpreter.run();
     }

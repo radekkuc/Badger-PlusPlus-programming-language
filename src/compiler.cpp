@@ -62,10 +62,12 @@ void Compiler::compileNode(ASTNode* node) {
             break;
             
         case NodeType::Bool:
-            constants.push_back(node->value);
+        {
+            bool val = (node->value == "true");  
+            constants.push_back(val);
             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
             break;
-
+        }
         case NodeType::Plus:
             compileNode(node->left);
             compileNode(node->right);

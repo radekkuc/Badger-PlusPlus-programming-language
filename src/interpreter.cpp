@@ -14,13 +14,15 @@ void Interpreter::run() {
                 break;
             }
             case OpCode::STORE:
-            {
+            {   
+                // we only get here but no further, PROBLEM IS IN COMPILER WITH CONSTANTS 
                 variables[byteCode_[index].operand] = stack.back();
+                // we dont get here
                 stack.pop_back();
                 break;
             }
             case OpCode::LOAD:
-            { 
+            {   
                 stack.push_back(variables[byteCode_[index].operand]);
                 break;
             }
@@ -35,9 +37,12 @@ void Interpreter::run() {
             }
             case OpCode::ADD:
             {
+                // Value b = stack.back(); stack.pop_back();
+                // Value a = stack.back(); stack.pop_back();
+                // add(a,b);
                 int b = std::get<int>(stack.back()); stack.pop_back();
                 int a = std::get<int>(stack.back()); stack.pop_back();
-                stack.push_back(a + b);
+                stack.push_back(a + b); // actually pushed 
                 break;
             }
             case OpCode::SUB:
@@ -70,13 +75,14 @@ void Interpreter::run() {
 }
 
 
-void Interpreter::add(Value a, Value b) {
-    std::visit([](const auto& v1, const auto& v2) {
+void Interpreter::add(const Value& a, const Value& b) {
+    std::visit([this](const auto& v1, const auto& v2) {
         using V1 = std::decay_t<decltype(v1)>;
         using V2 = std::decay_t<decltype(v2)>;
         
-        if constexpr(is_numeric<V1> || is_numeric<V2>) {
-            stack.push_back(V1 + V2);
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1) + static_cast<Type>(v2));
         }
     }, a, b);
 }
