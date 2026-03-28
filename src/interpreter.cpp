@@ -1,4 +1,5 @@
 #include "interpreter.h"
+#include "utils.h"
 #include <iostream>
 
 Interpreter::Interpreter(const std::vector<Instruction>& byteCode, const std::vector<Value>& constants) : byteCode_(byteCode), variables(constants) {};
@@ -73,7 +74,9 @@ void Interpreter::add(Value a, Value b) {
     std::visit([](const auto& v1, const auto& v2) {
         using V1 = std::decay_t<decltype(v1)>;
         using V2 = std::decay_t<decltype(v2)>;
-
-        //if constexpr(is_numeric_v<)
+        
+        if constexpr(is_numeric<V1> || is_numeric<V2>) {
+            stack.push_back(V1 + V2);
+        }
     }, a, b);
 }

@@ -4,3 +4,5 @@ let z = 10.5;
 print(y);
 print(" ");
 print(x);
+print(" ");
+print(z);
