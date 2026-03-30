@@ -1,4 +1,5 @@
-let x = 10;
-let y = x + 2;
-let z = x + y;
-print(z);
+let x = "damian";
+print(x);
+print(" malpka ma tyle iq: ");
+let y = 0;
+print(y);

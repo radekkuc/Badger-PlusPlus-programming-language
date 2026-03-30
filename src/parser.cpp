@@ -189,3 +189,26 @@ const char* Parser::tokenType(TokenType type) {
     }
     return "UNKNOWN";
 }
+
+const char* Parser::nodeType(NodeType type) {
+    switch (type) {
+        case NodeType::VarDecl:    return "VarDecl";
+        case NodeType::Print:      return "Print";
+        case NodeType::Assignment: return "Assignment";
+
+        case NodeType::Plus:       return "Plus";
+        case NodeType::Minus:      return "Minus";
+        case NodeType::Asterisk:   return "Asterisk";
+        case NodeType::Slash:      return "Slash";
+        case NodeType::Equal:      return "Equal";
+        case NodeType::Lparen:     return "Lparen";
+        case NodeType::Rparen:     return "Rparen";
+
+        case NodeType::Number:     return "Number";
+        case NodeType::Variable:   return "Variable";
+        case NodeType::Bool:       return "Bool";
+        case NodeType::String:     return "String";
+    }
+
+    return "Unknown"; 
+}

@@ -161,3 +161,11 @@ std::vector<Instruction> Compiler::getByteCode() const {
 std::vector<Value> Compiler::getConstants() const {
     return constants;
 }
+
+std::vector<Value> Compiler::getVariables() const {
+    return variables;
+}
+
+int Compiler::getVariableCount() const {
+    return variableCount;
+}

@@ -2,7 +2,7 @@
 #include "utils.h"
 #include <iostream>
 
-Interpreter::Interpreter(const std::vector<Instruction>& byteCode, const std::vector<Value>& constants) : byteCode_(byteCode), variables(constants) {};
+Interpreter::Interpreter(const std::vector<Instruction>& byteCode, const std::vector<Value>& constants, int varCount) : byteCode_(byteCode), constants_(constants) {variables.resize(varCount);};
 
 void Interpreter::run() {
     size_t index = 0;
@@ -10,14 +10,12 @@ void Interpreter::run() {
         switch(byteCode_[index].opcode) {
             case OpCode::CONSTANT:
             {
-                stack.push_back(variables[byteCode_[index].operand]);
+                stack.push_back(constants_[byteCode_[index].operand]);
                 break;
             }
             case OpCode::STORE:
             {   
-                // we only get here but no further, PROBLEM IS IN COMPILER WITH CONSTANTS 
                 variables[byteCode_[index].operand] = stack.back();
-                // we dont get here
                 stack.pop_back();
                 break;
             }
@@ -37,12 +35,9 @@ void Interpreter::run() {
             }
             case OpCode::ADD:
             {
-                // Value b = stack.back(); stack.pop_back();
-                // Value a = stack.back(); stack.pop_back();
-                // add(a,b);
-                int b = std::get<int>(stack.back()); stack.pop_back();
-                int a = std::get<int>(stack.back()); stack.pop_back();
-                stack.push_back(a + b); // actually pushed 
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                add(a,b);
                 break;
             }
             case OpCode::SUB:
@@ -84,5 +79,6 @@ void Interpreter::add(const Value& a, const Value& b) {
             using Type = std::common_type_t<V1,V2>;
             stack.push_back(static_cast<Type>(v1) + static_cast<Type>(v2));
         }
+
     }, a, b);
 }
