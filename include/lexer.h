@@ -8,7 +8,7 @@ enum class TokenType : uint8_t {
     ASTERISK, SLASH, PLUS, MINUS, LPAREN, RPAREN, EQUALS, SEMICOLON, 
     NUMBER, VARIABLE, ENDOFFILE,
     STRING, BOOL,
-    LET, PRINT };
+    LET, PRINT, PRINTLN };
 
 
 struct Token {

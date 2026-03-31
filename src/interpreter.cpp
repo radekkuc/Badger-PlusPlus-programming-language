@@ -33,6 +33,15 @@ void Interpreter::run() {
                 stack.pop_back();
                 break;
             }
+            case OpCode::PRINTLN:
+            { 
+                Value value = stack.back();
+                std::visit([](const auto& val) {
+                    std::cout << val << std::endl;
+                }, value);
+                stack.pop_back();
+                break;
+            }
             case OpCode::ADD:
             {
                 Value b = stack.back(); stack.pop_back();
@@ -41,25 +50,24 @@ void Interpreter::run() {
                 break;
             }
             case OpCode::SUB:
-            {
-                int b = std::get<int>(stack.back()); stack.pop_back();
-                int a = std::get<int>(stack.back()); stack.pop_back();
-                stack.push_back(a - b);
+            {   
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                sub(a,b);
                 break;
             }
             case OpCode::MUL:
-            {
-                int b = std::get<int>(stack.back()); stack.pop_back();
-                int a = std::get<int>(stack.back()); stack.pop_back();
-                stack.push_back(a * b);
+            {   
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                mul(a,b);
                 break;
             }
             case OpCode::DIV:
             {
-                int b = std::get<int>(stack.back()); stack.pop_back();
-                int a = std::get<int>(stack.back()); stack.pop_back();
-                if(b == 0) throw std::runtime_error("Divider cannot equal to 0");
-                stack.push_back(a / b);
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                div(a,b);
                 break;
             }
             default:
@@ -79,6 +87,55 @@ void Interpreter::add(const Value& a, const Value& b) {
             using Type = std::common_type_t<V1,V2>;
             stack.push_back(static_cast<Type>(v1) + static_cast<Type>(v2));
         }
+        else if constexpr(std::is_same_v<std::string, V1> && std::is_same_v<std::string, V2>) {
+            stack.push_back(v1 + v2);
+        }
+        else throw std::runtime_error("Wrong addition of paramters");
 
     }, a, b);
 }
+
+void Interpreter::sub(const Value& a, const Value& b) {
+    std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1)  - static_cast<Type>(v2));
+        }
+        else throw std::runtime_error("Wrong subtraction of parameters");
+    }, a, b);
+}
+
+void Interpreter::mul(const Value& a, const Value& b) {
+    std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1) * static_cast<Type>(v2));
+        }
+        else throw std::runtime_error("Wrong multiplication of parameters"); 
+    }, a, b); 
+}
+
+void Interpreter::div(const Value& a, const Value& b) {
+    std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            Type divisor = static_cast<Type>(v2);
+            if(divisor == 0) throw std::runtime_error("Cannot divide by 0");
+
+            stack.push_back(static_cast<Type>(v1) / divisor);
+        }
+        else throw std::runtime_error("Wrong division parameters");
+    }, a, b);
+}
+
+
+

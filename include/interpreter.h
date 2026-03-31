@@ -15,5 +15,9 @@ private:
 public:
     void run();
     void add(const Value& a, const Value& b);
+    void sub(const Value& a, const Value& b);
+    void mul(const Value& a, const Value& b);
+    void div(const Value& a, const Value& b);
+
     explicit Interpreter(const std::vector<Instruction>& byteCode, const std::vector<Value>& constants, int varCount);
 };

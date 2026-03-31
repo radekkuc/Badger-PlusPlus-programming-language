@@ -1,5 +1,12 @@
-let x = "damian";
-print(x);
-print(" malpka ma tyle iq: ");
-let y = 0;
-print(y);
+let x = 10 / 2;
+let y = 11.5 / 3;
+let z = 2 * 3;
+
+let word = "Result of each value: ";
+
+print(word);
+println(x);
+print(word);
+println(y);
+print(word);
+println(z);

@@ -3,7 +3,7 @@
 #include <memory>
 
 enum class NodeType : uint8_t {
-    VarDecl, Print, Assignment,
+    VarDecl, Print, Println, Assignment,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     Number, Variable, Bool, String
 };

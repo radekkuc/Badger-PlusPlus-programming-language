@@ -96,6 +96,7 @@ Token Lexer::readWord() {
     }
     if(variable == "let") return Token{TokenType::LET, variable};
     if(variable == "print") return Token{TokenType::PRINT, variable};
+    if(variable == "println") return Token{TokenType::PRINTLN, variable};
     if(variable == "true" || variable == "false") return Token{TokenType::BOOL, variable};
     return Token{TokenType::VARIABLE, variable};
 }

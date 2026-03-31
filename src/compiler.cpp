@@ -28,6 +28,11 @@ void Compiler::compileNode(ASTNode* node) {
             bytecode.push_back({OpCode::PRINT});
             break;
 
+        case NodeType::Println:
+            compileNode(node->left);
+            bytecode.push_back({OpCode::PRINTLN});
+            break;
+
         case NodeType::Assignment:
             compileNode(node->left);
             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);

@@ -38,7 +38,8 @@ ASTNode* Parser::parseStatement() {
         }
         else throw std::runtime_error("Expected variable declaration but got: " + tokens_[currIndex_].value);
     }
-    else if(match(TokenType::PRINT)) {
+    else if(match(TokenType::PRINT) || match(TokenType::PRINTLN)) {
+        TokenType printToken = tokens_[currIndex_].type;
         advance();
         if(match(TokenType::LPAREN)) {
             advance();
@@ -47,7 +48,8 @@ ASTNode* Parser::parseStatement() {
                 throw std::runtime_error("Missing closing paren");
             }
             advance();
-            return new ASTNode(NodeType::Print, "", node);
+            if(printToken == TokenType::PRINT) return new ASTNode(NodeType::Print, "", node);
+            else return new ASTNode(NodeType::Println, "", node);
         }
         throw std::runtime_error("Missing open paren");
     }
