@@ -8,6 +8,7 @@ enum class NodeType : uint8_t {
     Number, Variable, Bool, String
 };
 
+// Sub Branch
 struct ASTNode {
     NodeType nodeType;
     std::string value;    
