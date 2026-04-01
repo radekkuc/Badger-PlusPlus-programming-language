@@ -12,10 +12,10 @@ enum class NodeType : uint8_t {
 struct ASTNode {
     NodeType nodeType;
     std::string value;    
-    ASTNode* left;
-    ASTNode* right;
+    std::unique_ptr<ASTNode> left;
+    std::unique_ptr<ASTNode> right;
 
-    ASTNode(NodeType nodeType, const std::string& value, ASTNode* left = nullptr, ASTNode* right = nullptr);
+    ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr);
 };
 
 class Parser {
