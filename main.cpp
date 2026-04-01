@@ -21,7 +21,7 @@ int main(int argc, char** argv){
         // }
 
         Parser parser(tokens);
-        std::vector<ASTNode*> nodes = parser.parseProgram();
+        std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
 
         // for(const auto& node : nodes) {
         //     std::cout << "--------\n"; 

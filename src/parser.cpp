@@ -2,26 +2,27 @@
 #include <stdexcept>
 #include <iostream>
 
-ASTNode::ASTNode(NodeType nodeType, const std::string& value, ASTNode* left, ASTNode* right) : 
-nodeType(nodeType), value(value), left(left), right(right) {};
+ASTNode::ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right) : 
+nodeType(nodeType), value(value), left(std::move(left)), right(std::move(right)) {};
+
 
 Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens) {}; 
 
-std::vector<ASTNode*> Parser::parseProgram() {
-    ASTNode* statementNode = nullptr;
-    std::vector<ASTNode*> nodes{};
+std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
+    std::unique_ptr<ASTNode> statementNode = nullptr;
+    std::vector<std::unique_ptr<ASTNode>> nodes{};
     while(tokens_[currIndex_].type != TokenType::ENDOFFILE) {
-        statementNode = parseStatement();
+        statementNode = std::move(parseStatement());
         if(!match(TokenType::SEMICOLON)) {
             throw std::runtime_error("Missing ; at the end");
         } 
         else advance();
-        nodes.emplace_back(statementNode);
+        nodes.emplace_back(std::move(statementNode));
     }
     return nodes;
 } 
 
-ASTNode* Parser::parseStatement() {
+std::unique_ptr<ASTNode> Parser::parseStatement() {
     if(match(TokenType::LET)) {
         advance();
         if(match(TokenType::VARIABLE)) {
@@ -29,11 +30,11 @@ ASTNode* Parser::parseStatement() {
             advance();
             if(match(TokenType::EQUALS)) {
                 advance();
-                ASTNode* expressionNode = parseExpression();
-                return new ASTNode(NodeType::VarDecl, variableToken.value, expressionNode);
+                std::unique_ptr<ASTNode> expressionNode = std::move(parseExpression());
+                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value, std::move(expressionNode));            
             }
             else {
-                return new ASTNode(NodeType::VarDecl, variableToken.value);
+                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value);
             }      
         }
         else throw std::runtime_error("Expected variable declaration but got: " + tokens_[currIndex_].value);
@@ -43,13 +44,13 @@ ASTNode* Parser::parseStatement() {
         advance();
         if(match(TokenType::LPAREN)) {
             advance();
-            ASTNode* node = parseExpression();
+            std::unique_ptr<ASTNode> node = std::move(parseExpression());
             if(!match(TokenType::RPAREN)) {
                 throw std::runtime_error("Missing closing paren");
             }
             advance();
-            if(printToken == TokenType::PRINT) return new ASTNode(NodeType::Print, "", node);
-            else return new ASTNode(NodeType::Println, "", node);
+            if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "", std::move(node));
+            else return std::make_unique<ASTNode>(NodeType::Println, "", std::move(node));
         }
         throw std::runtime_error("Missing open paren");
     }
@@ -58,70 +59,70 @@ ASTNode* Parser::parseStatement() {
         advance();
         if(match(TokenType::EQUALS)) {
             advance();
-            ASTNode* node = parseExpression();
-            return new ASTNode(NodeType::Assignment, token.value, node);
+            std::unique_ptr<ASTNode> node = std::move(parseExpression());
+            return std::make_unique<ASTNode>(NodeType::Assignment, token.value, std::move(node));
         }
         throw std::runtime_error("Expected variable assigment but got: " + tokens_[currIndex_].value);
     }
     throw std::runtime_error("Unexpected statement: " + tokens_[currIndex_].value);
 }
 
-ASTNode* Parser::parseExpression() {
-    ASTNode* left = parseTerm(); 
+std::unique_ptr<ASTNode> Parser::parseExpression() {
+    std::unique_ptr<ASTNode> left = std::move(parseTerm()); 
     while(match(TokenType::PLUS) || match(TokenType::MINUS)) {
         TokenType signToken = tokens_[currIndex_].type;
         advance();
-        ASTNode* right = parseTerm();
-        if(signToken == TokenType::PLUS) left = new ASTNode(NodeType::Plus, "Plus", left, right); 
-        if(signToken == TokenType::MINUS) left = new ASTNode(NodeType::Minus, "Minus", left, right); 
+        std::unique_ptr<ASTNode> right = std::move(parseTerm());
+        if(signToken == TokenType::PLUS) left = std::make_unique<ASTNode>(NodeType::Plus, "Plus", std::move(left), std::move(right));  
+        if(signToken == TokenType::MINUS) left = std::make_unique<ASTNode>(NodeType::Minus, "Minus", std::move(left), std::move(right)); 
     }
     return left;
 }
 
-ASTNode* Parser::parseTerm() {
-    ASTNode* left = parseFactor();
+std::unique_ptr<ASTNode> Parser::parseTerm() {
+    std::unique_ptr<ASTNode> left = std::move(parseFactor());
     while(match(TokenType::ASTERISK) || match(TokenType::SLASH)) {
         TokenType signToken = tokens_[currIndex_].type;
         advance();
         
-        ASTNode* right = parseFactor();
+        std::unique_ptr<ASTNode> right = std::move(parseFactor());
 
-        if(signToken == TokenType::ASTERISK) left = new ASTNode(NodeType::Asterisk, "Asterisk", left, right);
-        if(signToken == TokenType::SLASH) left = new ASTNode(NodeType::Slash, "Slash", left, right);
+        if(signToken == TokenType::ASTERISK) left = std::make_unique<ASTNode>(NodeType::Asterisk, "Asterisk", std::move(left), std::move(right));
+        if(signToken == TokenType::SLASH) left = std::make_unique<ASTNode>(NodeType::Slash, "Slash", std::move(left), std::move(right));
     } 
     return left;
 }
 
-ASTNode* Parser::parseFactor() {
+std::unique_ptr<ASTNode> Parser::parseFactor() {
     //std::cout << "What is the value here "<< tokenType(tokens_[currIndex_].type) << " " <<  tokens_[currIndex_].value << std::endl;
     if(match(TokenType::NUMBER)) {
-        ASTNode* node = new ASTNode(NodeType::Number, tokens_[currIndex_].value); 
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Number, tokens_[currIndex_].value); 
         advance();
         return node;
     }
 
     if(match(TokenType::LPAREN)) {
         advance();
-        ASTNode* node = parseExpression();
+        std::unique_ptr<ASTNode> node = std::move(parseExpression());
         if(!match(TokenType::RPAREN)) throw std::runtime_error("Missing closing paren");
         advance();
         return node;
     }
 
     if(match(TokenType::VARIABLE)) {
-        ASTNode* node = new ASTNode(NodeType::Variable, tokens_[currIndex_].value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Variable, tokens_[currIndex_].value); 
         advance(); 
         return node; 
     }
 
     if(match(TokenType::BOOL)) {
-        ASTNode* node = new ASTNode(NodeType::Bool, tokens_[currIndex_].value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Bool, tokens_[currIndex_].value);
         advance();
         return node;
     }
 
     if(match(TokenType::STRING)) {
-        ASTNode* node = new ASTNode(NodeType::String, tokens_[currIndex_].value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::String, tokens_[currIndex_].value);
         advance();
         return node;
     }
@@ -143,27 +144,27 @@ void Parser::advance() {
     if(currIndex_ >= tokens_.size()) throw std::runtime_error("Cannot advance as currIndex is out of bounds");
 }
 
-void Parser::printAST(ASTNode* node, int depth) {
+void Parser::printAST(const ASTNode* node, int depth) {
     if (!node) return;
     for (int i = 0; i < depth; i++) std::cout << "  ";
 
     std::cout << " (" << node->value << ")\n";
     if (node->left) {
         std::cout << std::string(depth * 2, ' ') << "Left: \n";
-        printAST(node->left, depth + 1);
+        printAST(node->left.get(), depth + 1);
     }
     if (node->right) {
         std::cout << std::string(depth * 2, ' ') << "Right: \n";
-        printAST(node->right, depth + 1);
+        printAST(node->right.get(), depth + 1);
     }
 }
 
-void Parser::printAST(const std::vector<ASTNode*>& nodes) {
+void Parser::printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes) {
     std::cout << "Program AST:\n";
 
     for (size_t i = 0; i < nodes.size(); ++i) {
         std::cout << "\nStatement " << i + 1 << ":\n";
-        printAST(nodes[i], 1);
+        printAST(nodes[i].get(), 1);
     }
 }
 

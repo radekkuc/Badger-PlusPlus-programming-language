@@ -20,16 +20,16 @@ using Value = std::variant<int, std::string, float, bool>;
 class Compiler {
 private:
     int variableCount;
-    std::vector<ASTNode*> nodes_;
+    const std::vector<std::unique_ptr<ASTNode>>& nodes_;
     std::vector<Instruction> bytecode;
     std::unordered_map<std::string, int> variableTable;
     std::vector<Value> constants;
     std::vector<Value> variables;
     std::unordered_map<std::string, bool> initialised;
 
-    void compileNode(ASTNode* node);
+    void compileNode(const ASTNode* node);
 public:
-    explicit Compiler(const std::vector<ASTNode*>& nodes);
+    explicit Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes);
     void compileProgram();
     void dumpBytecode() const;
     std::vector<Instruction> getByteCode() const;
