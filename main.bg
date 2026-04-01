@@ -1,12 +1,48 @@
-let x = 10 / 2;
-let y = 11.5 / 3;
-let z = 2 * 3;
+let a = 10 / 2;
+let b = 11.5 / 3;
+let c = 2 * 3;
+let d = 8 - 3;
+let e = 4 + 7;
+let f = (2 + 3) * 4;
+let g = 20 / (2 * 2);
+let h = a + c;
+let i = f - g;
+let j = true;
+let k = false;
+let msg = "Result: ";
 
-let word = "Result of each value: ";
+print(msg);
+println(a);
 
-print(word);
-println(x);
-print(word);
-println(y);
-print(word);
-println(z);
+print(msg);
+println(b);
+
+print(msg);
+println(c);
+
+print(msg);
+println(d);
+
+print(msg);
+println(e);
+
+print(msg);
+println(f);
+
+print(msg);
+println(g);
+
+print(msg);
+println(h);
+
+print(msg);
+println(i);
+
+print("Boolean value: ");
+println(j);
+
+print("Another boolean: ");
+println(k);
+
+print("Expression test: ");
+println((3 + 2) * (10 - 4) / 5);

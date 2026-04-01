@@ -25,15 +25,15 @@ private:
 
 public:
     explicit Parser(const std::vector<Token>& tokens);
-    std::vector<ASTNode*> parseProgram(); // parsing whole program into AST
-    ASTNode* parseStatement(); // parsing statements like let, print
-    ASTNode* parseExpression(); // adds/subtracts factors
-    ASTNode* parseTerm(); // divides/multiplies factors
-    ASTNode* parseFactor(); // the smallest value we can get: x, 10, 10 + 5
+    std::vector<std::unique_ptr<ASTNode>> parseProgram(); // parsing whole program into AST
+    std::unique_ptr<ASTNode> parseStatement(); // parsing statements like let, print
+    std::unique_ptr<ASTNode> parseExpression(); // adds/subtracts factors
+    std::unique_ptr<ASTNode> parseTerm(); // divides/multiplies factors
+    std::unique_ptr<ASTNode> parseFactor(); // the smallest value we can get: x, 10, 10 + 5
     bool match(TokenType type);
     void advance();
-    void printAST(ASTNode* node, int depth = 0);
-    void printAST(const std::vector<ASTNode*>& nodes);
+    void printAST(const ASTNode* node, int depth = 0);
+    void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);
     const char* tokenType(TokenType type);
     const char* nodeType(NodeType type);
 };

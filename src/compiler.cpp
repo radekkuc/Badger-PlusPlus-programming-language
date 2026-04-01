@@ -2,9 +2,9 @@
 #include <string>
 #include <iostream>
 
-Compiler::Compiler(const std::vector<ASTNode*>& nodes) : variableCount{}, nodes_(nodes) {};
+Compiler::Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes) : variableCount{}, nodes_(nodes) {};
 
-void Compiler::compileNode(ASTNode* node) {
+void Compiler::compileNode(const ASTNode* node) {
     switch(node->nodeType) {
         case NodeType::VarDecl:
             if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
@@ -15,7 +15,7 @@ void Compiler::compileNode(ASTNode* node) {
                 break;
             }
             variableTable[node->value] = variableCount;
-            compileNode(node->left);
+            compileNode(node->left.get());
             bytecode.push_back({OpCode::STORE, variableCount});
             initialised[node->value] = true;
 
@@ -24,17 +24,17 @@ void Compiler::compileNode(ASTNode* node) {
             break;
 
         case NodeType::Print:
-            compileNode(node->left);
+            compileNode(node->left.get());
             bytecode.push_back({OpCode::PRINT});
             break;
 
         case NodeType::Println:
-            compileNode(node->left);
+            compileNode(node->left.get());
             bytecode.push_back({OpCode::PRINTLN});
             break;
 
         case NodeType::Assignment:
-            compileNode(node->left);
+            compileNode(node->left.get());
             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
             bytecode.push_back({OpCode::STORE, variableTable[node->value]});
             initialised[node->value] = true;
@@ -74,26 +74,26 @@ void Compiler::compileNode(ASTNode* node) {
             break;
         }
         case NodeType::Plus:
-            compileNode(node->left);
-            compileNode(node->right);
+            compileNode(node->left.get());
+            compileNode(node->right.get());
             bytecode.push_back({OpCode::ADD});
             break;
 
         case NodeType::Minus:
-            compileNode(node->left);
-            compileNode(node->right);
+            compileNode(node->left.get());
+            compileNode(node->right.get());
             bytecode.push_back({OpCode::SUB});
             break;
 
         case NodeType::Asterisk:
-            compileNode(node->left);
-            compileNode(node->right);
+            compileNode(node->left.get());
+            compileNode(node->right.get());
             bytecode.push_back({OpCode::MUL});
             break;
 
         case NodeType::Slash:
-            compileNode(node->left);
-            compileNode(node->right);
+            compileNode(node->left.get());
+            compileNode(node->right.get());
             bytecode.push_back({OpCode::DIV});
             break;
         default:
@@ -103,7 +103,7 @@ void Compiler::compileNode(ASTNode* node) {
 
 void Compiler::compileProgram() {
     for(const auto& node : nodes_) {
-        compileNode(node);
+        compileNode(node.get());
     }
 }
 
