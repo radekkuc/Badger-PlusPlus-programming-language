@@ -15,8 +15,10 @@ struct ASTNode {
     std::string value;    
     std::unique_ptr<ASTNode> left;
     std::unique_ptr<ASTNode> right;
+    std::vector<std::unique_ptr<ASTNode>> statements;
 
-    ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr);
+    ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr,
+    std::vector<std::unique_ptr<ASTNode>> statements = {});
 };
 
 class Parser {

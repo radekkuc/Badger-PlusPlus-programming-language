@@ -2,8 +2,8 @@
 #include <stdexcept>
 #include <iostream>
 
-ASTNode::ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right) : 
-nodeType(nodeType), value(value), left(std::move(left)), right(std::move(right)) {};
+ASTNode::ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right, std::vector<std::unique_ptr<ASTNode>> statements) : 
+nodeType(nodeType), value(value), left(std::move(left)), right(std::move(right)), statements(std::move(statements)) {};
 
 
 Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens) {}; 
@@ -13,9 +13,7 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
     std::vector<std::unique_ptr<ASTNode>> nodes{};
     while(tokens_[currIndex_].type != TokenType::ENDOFFILE) {
         statementNode = parseStatement();
-        if(!match(TokenType::SEMICOLON)) {
-            throw std::runtime_error("Missing ; at the end");
-        } 
+        if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing ; at the end");
         else advance();
         nodes.emplace_back(std::move(statementNode));
     }
@@ -68,7 +66,23 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
         advance();
         if(match(TokenType::LPAREN)) {
             advance();
-            std::unique_ptr<ASTNode> node = parseExpression();
+            std::unique_ptr<ASTNode> conditionNode = parseExpression();
+            if(match(TokenType::RPAREN)) {
+                advance();
+                if(match(TokenType::LCURLY)) {
+                    std::vector<std::unique_ptr<ASTNode>> statementNodes;
+                    advance();
+                    while(!match(TokenType::RCURLY)) {
+                        std::unique_ptr<ASTNode> bodyNode = parseStatement();
+                        if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing semicolon in if statement");
+                        statementNodes.emplace_back(std::move(bodyNode));
+                    }
+                    if(!match(TokenType::RCURLY)) throw std::runtime_error("Missing closing curly brace in if statement");
+                    
+                }
+                throw std::runtime_error("Missing opening curly brace in if statement");
+            } 
+            throw std::runtime_error("Missing closing paren in if statement");
         }
 
 

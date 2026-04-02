@@ -10,7 +10,7 @@ enum class TokenType : uint8_t {
     NUMBER, VARIABLE, ENDOFFILE,
     STRING, BOOL,
     LET, PRINT, PRINTLN,
-    IF, ELSE
+    IF, ELSE, BODY
 };
 
 
