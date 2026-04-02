@@ -4,6 +4,7 @@
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
+    If, Else,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     Number, Variable, Bool, String
 };
@@ -20,8 +21,8 @@ struct ASTNode {
 
 class Parser {
 private:
-    size_t currIndex_;
     std::vector<Token> tokens_;
+    size_t currIndex_;
 
 public:
     explicit Parser(const std::vector<Token>& tokens);

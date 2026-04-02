@@ -50,7 +50,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
             }
             advance();
             if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "", std::move(node));
-            else return std::make_unique<ASTNode>(NodeType::Println, "", std::move(node));
+            else if(printToken == TokenType::PRINTLN) return std::make_unique<ASTNode>(NodeType::Println, "", std::move(node));
         }
         throw std::runtime_error("Missing open paren");
     }
@@ -63,6 +63,18 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
             return std::make_unique<ASTNode>(NodeType::Assignment, token.value, std::move(node));
         }
         throw std::runtime_error("Expected variable assigment but got: " + tokens_[currIndex_].value);
+    }
+    else if(match(TokenType::IF)) {
+        advance();
+        if(match(TokenType::LPAREN)) {
+            advance();
+            std::unique_ptr<ASTNode> node = parseExpression();
+        }
+
+
+    }
+    else if(match(TokenType::ELSE)) {
+
     }
     throw std::runtime_error("Unexpected statement: " + tokens_[currIndex_].value);
 }

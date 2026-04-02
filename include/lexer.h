@@ -5,10 +5,13 @@
 
 
 enum class TokenType : uint8_t {
-    ASTERISK, SLASH, PLUS, MINUS, LPAREN, RPAREN, EQUALS, SEMICOLON, 
+    ASTERISK, SLASH, PLUS, MINUS, EQUALS, SEMICOLON, 
+    LPAREN, RPAREN, LCURLY, RCURLY,
     NUMBER, VARIABLE, ENDOFFILE,
     STRING, BOOL,
-    LET, PRINT, PRINTLN };
+    LET, PRINT, PRINTLN,
+    IF, ELSE
+};
 
 
 struct Token {
@@ -19,8 +22,8 @@ struct Token {
 
 class Lexer {
 private:
-    size_t currIndex_;
     std::string line_;
+    size_t currIndex_;
 public:
     explicit Lexer(const std::string& line);
 
