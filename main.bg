@@ -1,6 +1,13 @@
 let x = 10;
+let z = 20;
 let y = true;
+print(x);
+x = z;
 
 if(y) {
     print(x);
+}
+
+if(y) {
+    print(y);
 }

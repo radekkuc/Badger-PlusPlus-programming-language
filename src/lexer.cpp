@@ -35,16 +35,22 @@ std::vector<Token> Lexer::identify() {
                 tokens.push_back(Token{TokenType::LPAREN, "("});
                 currIndex_++;
                 break;
+
             case ')':
                 tokens.push_back(Token{TokenType::RPAREN, ")"});
                 currIndex_++;
                 break;
+
             case '{':
                 tokens.push_back(Token{TokenType::LCURLY, "{"});
+                currIndex_++;
                 break;
+
             case '}':
                 tokens.push_back(Token{TokenType::RCURLY, "}"});
+                currIndex_++;
                 break;
+
             case '=':
                 tokens.push_back(Token{TokenType::EQUALS, "="});
                 currIndex_++;

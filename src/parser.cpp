@@ -11,11 +11,9 @@ Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens)
 std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
     std::unique_ptr<ASTNode> statementNode = nullptr;
     std::vector<std::unique_ptr<ASTNode>> nodes{};
-    while(tokens_[currIndex_].type != TokenType::ENDOFFILE) {
+    while(peek().type != TokenType::ENDOFFILE) {
         statementNode = parseStatement();
-        if(needSemicolon(statementNode.get()->nodeType)) {
-            if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing ; at the end");
-        }
+        if(needSemicolon(statementNode.get()->nodeType)) expect(TokenType::SEMICOLON, "Missing ; at the end");
         advance();
         nodes.emplace_back(std::move(statementNode));
     }
@@ -23,89 +21,18 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
 } 
 
 std::unique_ptr<ASTNode> Parser::parseStatement() {
-    if(match(TokenType::LET)) {
-        advance();
-        if(match(TokenType::VARIABLE)) {
-            Token variableToken = tokens_[currIndex_];
-            advance();
-            if(match(TokenType::EQUALS)) {
-                advance();
-                std::unique_ptr<ASTNode> expressionNode = parseExpression();
-                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value, std::move(expressionNode));            
-            }
-            else {
-                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value);
-            }      
-        }
-        else throw std::runtime_error("Expected variable declaration but got: " + tokens_[currIndex_].value);
-    }
-    else if(match(TokenType::PRINT) || match(TokenType::PRINTLN)) {
-        TokenType printToken = tokens_[currIndex_].type;
-        advance();
-        if(match(TokenType::LPAREN)) {
-            advance();
-            std::unique_ptr<ASTNode> node = parseExpression();
-            if(!match(TokenType::RPAREN)) {
-                throw std::runtime_error("Missing closing paren");
-            }
-            advance();
-            if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "Print", std::move(node));
-            else if(printToken == TokenType::PRINTLN) return std::make_unique<ASTNode>(NodeType::Println, "Println", std::move(node));
-        }
-        throw std::runtime_error("Missing open paren");
-    }
-    else if(match(TokenType::VARIABLE)) {
-        Token token = tokens_[currIndex_];
-        advance();
-        if(match(TokenType::EQUALS)) {
-            advance();
-            std::unique_ptr<ASTNode> node = parseExpression();
-            return std::make_unique<ASTNode>(NodeType::Assignment, token.value, std::move(node));
-        }
-        throw std::runtime_error("Expected variable assigment but got: " + tokens_[currIndex_].value);
-    }
-    else if(match(TokenType::IF)) {
-        std::cout << "Token here " << tokens_[currIndex_].value << std::endl;
-        advance();
-        if(match(TokenType::LPAREN)) {
-            std::cout << "Token here " << tokens_[currIndex_].value << std::endl;
-            advance();
-            std::unique_ptr<ASTNode> conditionNode = parseExpression();
-            if(match(TokenType::RPAREN)) {
-                advance();
-                if(match(TokenType::LCURLY)) {
-                    std::vector<std::unique_ptr<ASTNode>> statementNodes;
-                    advance();
-                    while(!match(TokenType::RCURLY)) {
-                        std::unique_ptr<ASTNode> bodyNode = parseStatement();
-                        std::cout << "value here? " << bodyNode.get()->value << std::endl;
-                        if(needSemicolon(bodyNode.get()->nodeType)) {
-                            if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing semicolon in if statement");
-                        }
-                        advance();
-                        statementNodes.emplace_back(std::move(bodyNode));
-                    }
-                    if(!match(TokenType::RCURLY)) throw std::runtime_error("Missing closing curly brace in if statement");
-                    advance();
-                    std::unique_ptr<ASTNode> bodyNode = std::make_unique<ASTNode>(NodeType::Body, "Body", nullptr, nullptr, std::move(statementNodes));
-                    return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(bodyNode));
-                }
-                throw std::runtime_error("Missing opening curly brace in if statement");
-            } 
-            throw std::runtime_error("Missing closing paren in if statement");
-        }
-        throw std::runtime_error("Missing opening paren in if statement");
-    }
-    else if(match(TokenType::ELSE)) {
-
-    }
-    throw std::runtime_error("Unexpected statement: " + tokens_[currIndex_].value);
+    if(match(TokenType::LET)) return parseLetStatement();
+    if(match(TokenType::PRINT) || match(TokenType::PRINTLN)) return parsePrintStatement();  
+    if(match(TokenType::VARIABLE)) return parseAssignment();
+    if(match(TokenType::IF)) return parseIfStatement();
+    if(match(TokenType::ELSE)) return parseElseStatement();
+    throw std::runtime_error("Unexpected statement: " + peek().value);
 }
 
 std::unique_ptr<ASTNode> Parser::parseExpression() {
     std::unique_ptr<ASTNode> left = parseTerm(); 
     while(match(TokenType::PLUS) || match(TokenType::MINUS)) {
-        TokenType signToken = tokens_[currIndex_].type;
+        TokenType signToken = peek().type;
         advance();
         std::unique_ptr<ASTNode> right = parseTerm();
         if(signToken == TokenType::PLUS) left = std::make_unique<ASTNode>(NodeType::Plus, "Plus", std::move(left), std::move(right));  
@@ -117,11 +44,9 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 std::unique_ptr<ASTNode> Parser::parseTerm() {
     std::unique_ptr<ASTNode> left = parseFactor();
     while(match(TokenType::ASTERISK) || match(TokenType::SLASH)) {
-        TokenType signToken = tokens_[currIndex_].type;
+        TokenType signToken = peek().type;
         advance();
-        
         std::unique_ptr<ASTNode> right = parseFactor();
-
         if(signToken == TokenType::ASTERISK) left = std::make_unique<ASTNode>(NodeType::Asterisk, "Asterisk", std::move(left), std::move(right));
         if(signToken == TokenType::SLASH) left = std::make_unique<ASTNode>(NodeType::Slash, "Slash", std::move(left), std::move(right));
     } 
@@ -130,7 +55,7 @@ std::unique_ptr<ASTNode> Parser::parseTerm() {
 
 std::unique_ptr<ASTNode> Parser::parseFactor() {
     if(match(TokenType::NUMBER)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Number, tokens_[currIndex_].value); 
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Number, peek().value); 
         advance();
         return node;
     }
@@ -138,38 +63,117 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
     if(match(TokenType::LPAREN)) {
         advance();
         std::unique_ptr<ASTNode> node = parseExpression();
-        if(!match(TokenType::RPAREN)) throw std::runtime_error("Missing closing paren");
+        expect(TokenType::RPAREN, "Missing closing paren");
         advance();
         return node;
     }
 
     if(match(TokenType::VARIABLE)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Variable, tokens_[currIndex_].value); 
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Variable, peek().value); 
         advance(); 
         return node; 
     }
 
     if(match(TokenType::BOOL)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Bool, tokens_[currIndex_].value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Bool, peek().value);
         advance();
         return node;
     }
 
     if(match(TokenType::STRING)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::String, tokens_[currIndex_].value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::String, peek().value);
         advance();
         return node;
     }
-
-    throw std::runtime_error("Unexpected token: " + tokens_[currIndex_].value);
+    throw std::runtime_error("Unexpected token: " + peek().value);
 }
 
-bool Parser::match(TokenType type) {
+std::unique_ptr<ASTNode> Parser::parseLetStatement() {
+        advance();
+        if(match(TokenType::VARIABLE)) {
+            Token variableToken = peek();
+            advance();
+            if(match(TokenType::EQUALS)) {
+                advance();
+                std::unique_ptr<ASTNode> expressionNode = parseExpression();
+                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value, std::move(expressionNode));            
+            }
+            else {
+                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value);
+            }      
+        }
+        else throw std::runtime_error("Expected variable declaration but got: " + peek().value);
+}
+
+std::unique_ptr<ASTNode> Parser::parsePrintStatement() {
+        TokenType printToken = peek().type;
+        advance();
+        if(match(TokenType::LPAREN)) {
+            advance();
+            std::unique_ptr<ASTNode> node = parseExpression();
+            expect(TokenType::RPAREN, "Missing closing paren");
+            advance();
+            if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "Print", std::move(node));
+            else if(printToken == TokenType::PRINTLN) return std::make_unique<ASTNode>(NodeType::Println, "Println", std::move(node));
+        }
+        throw std::runtime_error("Missing open paren");
+}
+
+std::unique_ptr<ASTNode> Parser::parseAssignment() {
+        Token token = peek();
+        advance();
+        if(match(TokenType::EQUALS)) {
+            advance();
+            std::unique_ptr<ASTNode> node = parseExpression();
+            return std::make_unique<ASTNode>(NodeType::Assignment, token.value, std::move(node));
+        }
+        throw std::runtime_error("Expected variable assigment but got: " + peek().value);
+}
+
+std::unique_ptr<ASTNode> Parser::parseIfStatement() {
+        advance();
+        if(match(TokenType::LPAREN)) {
+            advance();
+            std::unique_ptr<ASTNode> conditionNode = parseExpression();
+            if(match(TokenType::RPAREN)) {
+                advance();
+                if(match(TokenType::LCURLY))  return parseBlock(std::move(conditionNode));        
+                throw std::runtime_error("Missing opening curly brace in if statement");
+            } 
+            throw std::runtime_error("Missing closing paren in if statement");
+        }
+        throw std::runtime_error("Missing opening paren in if statement");
+}
+
+std::unique_ptr<ASTNode> Parser::parseBlock(std::unique_ptr<ASTNode> conditionNode) {
+    std::vector<std::unique_ptr<ASTNode>> statementNodes;
+    advance();
+    while(!match(TokenType::RCURLY)) {
+        std::unique_ptr<ASTNode> bodyNode = parseStatement();
+        if(needSemicolon(bodyNode.get()->nodeType)) expect(TokenType::SEMICOLON, "Missing semicolon in if statement");
+        advance();
+        statementNodes.emplace_back(std::move(bodyNode));
+        }
+    expect(TokenType::RCURLY, "Missing closing curly brace in if statement");
+    std::unique_ptr<ASTNode> bodyNode = std::make_unique<ASTNode>(NodeType::Body, "Body", nullptr, nullptr, std::move(statementNodes));
+    return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(bodyNode));
+}
+
+std::unique_ptr<ASTNode> Parser::parseElseStatement() {
+    return nullptr;
+}
+
+Token Parser::peek() {
+    return tokens_[currIndex_];
+}
+
+bool Parser::match(TokenType type)
+{
     if(currIndex_ >= tokens_.size()) {
         std::cerr << "Cannot check token as it is out of bounds\n";
         return false;
     } 
-    if(tokens_[currIndex_].type == type) return true;
+    if(peek().type == type) return true;
     return false;
 }
 
@@ -181,6 +185,10 @@ bool Parser::needSemicolon(NodeType type) {
 void Parser::advance() {
     currIndex_++;
     if(currIndex_ >= tokens_.size()) throw std::runtime_error("Cannot advance as currIndex is out of bounds");
+}
+
+void Parser::expect(TokenType token, const std::string &errorMessage) {
+    if(!match(token)) throw std::runtime_error(errorMessage);
 }
 
 void Parser::printAST(const ASTNode* node, int depth) {

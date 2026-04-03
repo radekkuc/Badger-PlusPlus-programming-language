@@ -32,11 +32,26 @@ public:
     std::unique_ptr<ASTNode> parseExpression(); // adds/subtracts factors
     std::unique_ptr<ASTNode> parseTerm(); // divides/multiplies factors
     std::unique_ptr<ASTNode> parseFactor(); // the smallest value we can get: x, 10, 10 + 5
+
+    std::unique_ptr<ASTNode> parseLetStatement();
+    std::unique_ptr<ASTNode> parsePrintStatement();
+    std::unique_ptr<ASTNode> parseAssignment();
+    std::unique_ptr<ASTNode> parseIfStatement();
+    std::unique_ptr<ASTNode> parseElseStatement();
+    std::unique_ptr<ASTNode> parseBlock(std::unique_ptr<ASTNode> conditionNode);
+
+
+    //std::vector<std::unique_ptr<ASTNode>> parseBlock(parameters);
+    Token peek();
     bool match(TokenType type);
     bool needSemicolon(NodeType type);
     const char* tokenType(TokenType type);
     const char* nodeType(NodeType type);
     void advance();
+    void expect(TokenType token, const std::string& errorMessage);
+
     void printAST(const ASTNode* node, int depth = 0);
     void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);
+
+    
 };

@@ -15,7 +15,6 @@ int main(int argc, char** argv){
         
         Lexer lexer(code);
         std::vector<Token> tokens = lexer.identify();
-        std::cout << "WE get here?";
 
         for(Token token : tokens) {
             std::cout << token.value << std::endl;
