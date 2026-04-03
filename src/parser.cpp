@@ -13,8 +13,10 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
     std::vector<std::unique_ptr<ASTNode>> nodes{};
     while(tokens_[currIndex_].type != TokenType::ENDOFFILE) {
         statementNode = parseStatement();
-        if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing ; at the end");
-        else advance();
+        if(needSemicolon(statementNode.get()->nodeType)) {
+            if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing ; at the end");
+        }
+        advance();
         nodes.emplace_back(std::move(statementNode));
     }
     return nodes;
@@ -47,8 +49,8 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
                 throw std::runtime_error("Missing closing paren");
             }
             advance();
-            if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "", std::move(node));
-            else if(printToken == TokenType::PRINTLN) return std::make_unique<ASTNode>(NodeType::Println, "", std::move(node));
+            if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "Print", std::move(node));
+            else if(printToken == TokenType::PRINTLN) return std::make_unique<ASTNode>(NodeType::Println, "Println", std::move(node));
         }
         throw std::runtime_error("Missing open paren");
     }
@@ -63,8 +65,10 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
         throw std::runtime_error("Expected variable assigment but got: " + tokens_[currIndex_].value);
     }
     else if(match(TokenType::IF)) {
+        std::cout << "Token here " << tokens_[currIndex_].value << std::endl;
         advance();
         if(match(TokenType::LPAREN)) {
+            std::cout << "Token here " << tokens_[currIndex_].value << std::endl;
             advance();
             std::unique_ptr<ASTNode> conditionNode = parseExpression();
             if(match(TokenType::RPAREN)) {
@@ -74,18 +78,23 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
                     advance();
                     while(!match(TokenType::RCURLY)) {
                         std::unique_ptr<ASTNode> bodyNode = parseStatement();
-                        if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing semicolon in if statement");
+                        std::cout << "value here? " << bodyNode.get()->value << std::endl;
+                        if(needSemicolon(bodyNode.get()->nodeType)) {
+                            if(!match(TokenType::SEMICOLON)) throw std::runtime_error("Missing semicolon in if statement");
+                        }
+                        advance();
                         statementNodes.emplace_back(std::move(bodyNode));
                     }
                     if(!match(TokenType::RCURLY)) throw std::runtime_error("Missing closing curly brace in if statement");
-                    
+                    advance();
+                    std::unique_ptr<ASTNode> bodyNode = std::make_unique<ASTNode>(NodeType::Body, "Body", nullptr, nullptr, std::move(statementNodes));
+                    return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(bodyNode));
                 }
                 throw std::runtime_error("Missing opening curly brace in if statement");
             } 
             throw std::runtime_error("Missing closing paren in if statement");
         }
-
-
+        throw std::runtime_error("Missing opening paren in if statement");
     }
     else if(match(TokenType::ELSE)) {
 
@@ -162,6 +171,11 @@ bool Parser::match(TokenType type) {
     } 
     if(tokens_[currIndex_].type == type) return true;
     return false;
+}
+
+bool Parser::needSemicolon(NodeType type) {
+    if(type == NodeType::If) return false;
+    return true;
 }
 
 void Parser::advance() {

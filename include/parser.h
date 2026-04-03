@@ -4,12 +4,11 @@
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
-    If, Else,
+    If, Else, Body,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     Number, Variable, Bool, String
 };
 
-// Sub Branch
 struct ASTNode {
     NodeType nodeType;
     std::string value;    
@@ -34,9 +33,10 @@ public:
     std::unique_ptr<ASTNode> parseTerm(); // divides/multiplies factors
     std::unique_ptr<ASTNode> parseFactor(); // the smallest value we can get: x, 10, 10 + 5
     bool match(TokenType type);
+    bool needSemicolon(NodeType type);
+    const char* tokenType(TokenType type);
+    const char* nodeType(NodeType type);
     void advance();
     void printAST(const ASTNode* node, int depth = 0);
     void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);
-    const char* tokenType(TokenType type);
-    const char* nodeType(NodeType type);
 };

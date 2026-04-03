@@ -12,13 +12,14 @@ int main(int argc, char** argv){
         ss << file.rdbuf();
         const std::string& code = ss.str();
 
-        Lexer lexer(code);
         
+        Lexer lexer(code);
         std::vector<Token> tokens = lexer.identify();
+        std::cout << "WE get here?";
 
-        // for(Token token : tokens) {
-        //     std::cout << token.value << std::endl;
-        // }
+        for(Token token : tokens) {
+            std::cout << token.value << std::endl;
+        }
 
         Parser parser(tokens);
         std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
@@ -30,29 +31,29 @@ int main(int argc, char** argv){
         //     std::cout << "--------\n";
         // }
         // std::cout << "Using printing method\n"; 
-        // parser.printAST(nodes);
+        parser.printAST(nodes);
 
-        Compiler compiler(nodes);
-        compiler.compileProgram();
-        // std::unordered_map<std::string, int> variableMap = compiler.getMap();
-        // compiler.dumpBytecode();
+        // Compiler compiler(nodes);
+        // compiler.compileProgram();
+        // // std::unordered_map<std::string, int> variableMap = compiler.getMap();
+        // // compiler.dumpBytecode();
 
-        // for(const auto& pair : variableMap) {
-        //     std::cout << pair.first << "," << pair.second << std::endl; 
-        // }
+        // // for(const auto& pair : variableMap) {
+        // //     std::cout << pair.first << "," << pair.second << std::endl; 
+        // // }
 
-        std::vector<Instruction> byteCode = compiler.getByteCode();
-        std::vector<Value> constants = compiler.getConstants();
-        int varCount = compiler.getVariableCount();
+        // std::vector<Instruction> byteCode = compiler.getByteCode();
+        // std::vector<Value> constants = compiler.getConstants();
+        // int varCount = compiler.getVariableCount();
 
-        // for (const auto& constant : constants) {
-        //     std::visit([](const auto& v) {
-        //     std::cout << "Constants\n";
-        //     std::cout << v << std::endl;
-        //     }, constant);
-        // }
-        Interpreter interpreter(byteCode, constants, varCount);
-        interpreter.run();
+        // // for (const auto& constant : constants) {
+        // //     std::visit([](const auto& v) {
+        // //     std::cout << "Constants\n";
+        // //     std::cout << v << std::endl;
+        // //     }, constant);
+        // // }
+        // Interpreter interpreter(byteCode, constants, varCount);
+        // interpreter.run();
     }
     catch(const std::exception& e) {
         std::cerr << "Exception has occurred: " << e.what() << std::endl; 
