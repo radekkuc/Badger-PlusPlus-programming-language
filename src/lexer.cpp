@@ -9,7 +9,7 @@ Lexer::Lexer(const std::string& line) : line_{line}, currIndex_{0} {};
 std::vector<Token> Lexer::identify() {
     std::vector<Token> tokens;
     while(currIndex_ < line_.size()) {
-        char c = line_[currIndex_];
+        char c = peek();
         switch(c) {
             case '*':
                 tokens.push_back(Token{TokenType::ASTERISK, "*"});
@@ -75,33 +75,37 @@ std::vector<Token> Lexer::identify() {
 }
 
 void Lexer::skipWhiteSpace() {
-    while(isspace(line_[currIndex_]) && currIndex_ < line_.size()) {
+    while(isspace(peek()) && currIndex_ < line_.size()) {
         currIndex_++;
     }
+}
+
+char Lexer::peek() {
+    return line_[currIndex_];
 }
 
 Token Lexer::readNumber() {
     std::string number;
     bool hasDot = false;
     while(currIndex_ < line_.size()) {
-        if(isdigit(line_[currIndex_])) {
-            number += line_[currIndex_];
+        if(isdigit(peek())) {
+            number += peek();
         }
-        else if(line_[currIndex_] == '.' && !hasDot) {
-            number += line_[currIndex_];
+        else if(peek() == '.' && !hasDot) {
+            number += peek();
             hasDot = true;
         }
         else break; 
         currIndex_++;
     }
-    if(line_[currIndex_] == '.') throw std::runtime_error(std::string("Unexpected symbol in number definition: ")  + line_[currIndex_]);
+    if(peek() == '.') throw std::runtime_error(std::string("Unexpected symbol in number definition: ")  + peek());
     return Token{TokenType::NUMBER, number};
 }
 
 Token Lexer::readWord() {
     std::string variable;
-    while(isalpha(line_[currIndex_]) && currIndex_ < line_.size()) {
-        variable += line_[currIndex_];
+    while(isalpha(peek()) && currIndex_ < line_.size()) {
+        variable += peek();
         currIndex_++;
     }
     if(variable == "let") return Token{TokenType::LET, variable};
@@ -116,11 +120,11 @@ Token Lexer::readWord() {
 Token Lexer::readString() {
     std::string strVar;
     currIndex_++;
-    while(line_[currIndex_] != '"' && currIndex_ < line_.size()) {
-        strVar += line_[currIndex_];
+    while(peek() != '"' && currIndex_ < line_.size()) {
+        strVar += peek();
         currIndex_++;
     }
-    if(line_[currIndex_] != '"') throw std::runtime_error("Missing closing \" for string");
+    if(peek() != '"') throw std::runtime_error("Missing closing \" for string");
     currIndex_++;
     return Token{TokenType::STRING, strVar};
 }

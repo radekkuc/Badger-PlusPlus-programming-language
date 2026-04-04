@@ -31,6 +31,7 @@ public:
     Token readString();
     Token readNumber();
     Token readWord();
+    char peek();
 
     void skipWhiteSpace();
 };

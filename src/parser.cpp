@@ -135,17 +135,19 @@ std::unique_ptr<ASTNode> Parser::parseIfStatement() {
         if(match(TokenType::LPAREN)) {
             advance();
             std::unique_ptr<ASTNode> conditionNode = parseExpression();
+            std::unique_ptr<ASTNode> blockNode;
             if(match(TokenType::RPAREN)) {
                 advance();
-                if(match(TokenType::LCURLY))  return parseBlock(std::move(conditionNode));        
-                throw std::runtime_error("Missing opening curly brace in if statement");
+                if(match(TokenType::LCURLY)) blockNode = parseBlock();        
+                else throw std::runtime_error("Missing opening curly brace in if statement");
             } 
+            return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode));
             throw std::runtime_error("Missing closing paren in if statement");
         }
         throw std::runtime_error("Missing opening paren in if statement");
 }
 
-std::unique_ptr<ASTNode> Parser::parseBlock(std::unique_ptr<ASTNode> conditionNode) {
+std::unique_ptr<ASTNode> Parser::parseBlock() {
     std::vector<std::unique_ptr<ASTNode>> statementNodes;
     advance();
     while(!match(TokenType::RCURLY)) {
@@ -154,9 +156,8 @@ std::unique_ptr<ASTNode> Parser::parseBlock(std::unique_ptr<ASTNode> conditionNo
         advance();
         statementNodes.emplace_back(std::move(bodyNode));
         }
-    expect(TokenType::RCURLY, "Missing closing curly brace in if statement");
-    std::unique_ptr<ASTNode> bodyNode = std::make_unique<ASTNode>(NodeType::Body, "Body", nullptr, nullptr, std::move(statementNodes));
-    return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(bodyNode));
+    expect(TokenType::RCURLY, "Missing closing curly brace in statement");
+    return std::make_unique<ASTNode>(NodeType::Block, "Block", nullptr, nullptr, std::move(statementNodes));
 }
 
 std::unique_ptr<ASTNode> Parser::parseElseStatement() {
@@ -258,6 +259,7 @@ const char* Parser::nodeType(NodeType type) {
         case NodeType::Variable:   return "Variable";
         case NodeType::Bool:       return "Bool";
         case NodeType::String:     return "String";
+        case NodeType::If:         return "If";
     }
 
     return "Unknown"; 

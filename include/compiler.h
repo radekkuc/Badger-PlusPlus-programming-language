@@ -8,7 +8,7 @@ enum class OpCode : uint8_t {
     STORE, LOAD, PRINT, PRINTLN,
     CONSTANT, VARIABLE, STRING, BOOL,
     ADD, SUB, DIV, MUL,
-    IF, ELSE
+    JUMP_IF_FALSE, ELSE
 };
 
 struct Instruction {

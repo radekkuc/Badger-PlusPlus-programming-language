@@ -32,6 +32,25 @@ void Compiler::compileNode(const ASTNode* node) {
             compileNode(node->left.get());
             bytecode.push_back({OpCode::PRINTLN});
             break;
+        
+        case NodeType::If:
+        {   
+            compileNode(node->left.get());
+            
+            size_t jumpIndex = bytecode.size();
+            bytecode.push_back({OpCode::JUMP_IF_FALSE, 0});
+            compileNode(node->right.get());
+            bytecode[jumpIndex].operand = bytecode.size();
+            break;
+        }
+
+        case NodeType::Block:
+        {
+            for(const auto& stm : node->statements) {
+                compileNode(stm.get());
+            }
+            break;
+        }
 
         case NodeType::Assignment:
             compileNode(node->left.get());
@@ -118,6 +137,7 @@ std::string Compiler::opcodeToString(OpCode op) {
         case OpCode::SUB: return "SUB";
         case OpCode::DIV: return "DIV";
         case OpCode::MUL: return "MUL";
+        case OpCode::JUMP_IF_FALSE: return "JUMP_IF_FALSE";
         default: return "UNKNOWN";
     }
 }
@@ -135,7 +155,9 @@ void Compiler::dumpBytecode() const {
         if(instr.opcode == OpCode::STORE ||
            instr.opcode == OpCode::LOAD ||
            instr.opcode == OpCode::CONSTANT ||
-           instr.opcode == OpCode::VARIABLE)
+           instr.opcode == OpCode::VARIABLE ||
+           instr.opcode == OpCode::JUMP_IF_FALSE) 
+           
         {
             std::cout << " " << instr.operand;
         }
