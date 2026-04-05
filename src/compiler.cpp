@@ -36,7 +36,7 @@ void Compiler::compileNode(const ASTNode* node) {
         case NodeType::If:
         {   
             compileNode(node->left.get());
-            
+
             size_t jumpIndex = bytecode.size();
             bytecode.push_back({OpCode::JUMP_IF_FALSE, 0});
             compileNode(node->right.get());
@@ -131,6 +131,7 @@ std::string Compiler::opcodeToString(OpCode op) {
         case OpCode::STORE: return "STORE";
         case OpCode::LOAD: return "LOAD";
         case OpCode::PRINT: return "PRINT";
+        case OpCode::PRINTLN: return "PRINTLN";
         case OpCode::CONSTANT: return "CONSTANT";
         case OpCode::VARIABLE: return "VARIABLE";
         case OpCode::ADD: return "ADD";

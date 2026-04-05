@@ -42,6 +42,19 @@ void Interpreter::run() {
                 stack.pop_back();
                 break;
             }
+            case OpCode::JUMP_IF_FALSE:
+            {
+                Value value = stack.back(); stack.pop_back();
+
+                if(!std::holds_alternative<bool>(value)) throw std::runtime_error("Must provide bool in condition of if statement");
+                bool condition = std::get<bool>(value);
+                if(!condition) {
+                    int target = byteCode_[index].operand - 1; 
+                    if(target < 0 || target >= static_cast<int>(byteCode_.size())) throw std::runtime_error("Wrong jump location");
+                    index = static_cast<size_t>(target);
+                }
+                break;
+            }
             case OpCode::ADD:
             {
                 Value b = stack.back(); stack.pop_back();

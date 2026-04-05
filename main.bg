@@ -1,13 +1,16 @@
 let x = 10;
 let z = 20;
-let y = true;
-print(x);
-x = z;
 
-if(y) {
-    print(x);
+if(true) {
+    println("Value for x:");
+    println(x);
 }
 
-if(y) {
-    print(y);
+if(true) {
+    println("Value for z:");
+    println(z);
+}
+
+if(false) {
+    println("How did we get here xd");
 }
