@@ -31,6 +31,17 @@ std::vector<Token> Lexer::identify() {
                 currIndex_++;
                 break;
 
+            case '>':
+            case '<':
+            case '|':
+            case '&':
+            case '!':
+            case '=':
+            // NEED TO CHECK IF NEXT TOKEN IS ALSO = TO CHECK IF IT IS NOT COMPARISON
+                tokens.push_back(Token{TokenType::EQUALS, "="});
+                currIndex_++;
+                break;
+
             case '(':
                 tokens.push_back(Token{TokenType::LPAREN, "("});
                 currIndex_++;
@@ -50,12 +61,6 @@ std::vector<Token> Lexer::identify() {
                 tokens.push_back(Token{TokenType::RCURLY, "}"});
                 currIndex_++;
                 break;
-
-            case '=':
-                tokens.push_back(Token{TokenType::EQUALS, "="});
-                currIndex_++;
-                break;
-
             case ';':
                 tokens.push_back(Token{TokenType::SEMICOLON, ";"});
                 currIndex_++;
