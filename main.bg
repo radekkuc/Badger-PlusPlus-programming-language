@@ -1,16 +1,11 @@
-let x = 10;
-let z = 20;
+let x = true;
+let y = false;
 
-if(true) {
-    println("Value for x:");
-    println(x);
+if(x && y) {
+    println("&& if statement");
 }
 
-if(true) {
-    println("Value for z:");
-    println(z);
+if(x || y) {
+    println("|| if statement");
 }
 
-if(false) {
-    println("How did we get here xd");
-}

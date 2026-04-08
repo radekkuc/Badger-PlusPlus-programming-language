@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
+#include "utils.h"
 
 Lexer::Lexer(const std::string& line) : line_{line}, currIndex_{0} {};
 
@@ -32,13 +33,41 @@ std::vector<Token> Lexer::identify() {
                 break;
 
             case '>':
+                tokens.push_back(Token{TokenType::GREATER, ">"});
+                currIndex_++;
+                break;
+            
             case '<':
+                tokens.push_back(Token{TokenType::SMALLER, "<"});
+                currIndex_++;
+                break;
+
             case '|':
+                if(peekNext() == '|') {
+                    tokens.push_back(Token{TokenType::OR, "||"});
+                }
+                else throw std::runtime_error("Missing second | in logic operation");
+                currIndex_++;
+                break;
+
             case '&':
+                if(peekNext() == '&') {
+                    tokens.push_back(Token{TokenType::AND, "&&"});
+                }
+                else throw std::runtime_error("Missing second & in logic operation");
+                currIndex_++;
+                break;
+
             case '!':
+                tokens.push_back(Token{TokenType::NOT, "!"});
+                currIndex_++;
+                break;
+
             case '=':
-            // NEED TO CHECK IF NEXT TOKEN IS ALSO = TO CHECK IF IT IS NOT COMPARISON
-                tokens.push_back(Token{TokenType::EQUALS, "="});
+                if(peekNext() == '=') {
+                    tokens.push_back(Token{TokenType::COMPARISON, "=="});
+                }
+                else tokens.push_back(Token{TokenType::EQUALS, "="});
                 currIndex_++;
                 break;
 
@@ -87,6 +116,14 @@ void Lexer::skipWhiteSpace() {
 
 char Lexer::peek() {
     return line_[currIndex_];
+}
+
+char Lexer::peekNext() {
+    int indexHolder = static_cast<int>(currIndex_);
+    indexHolder++;
+    if(indexHolder >= line_.size()) throw std::runtime_error("Cannot peek next token as it is out of bounds");
+    currIndex_++;
+    return peek();
 }
 
 Token Lexer::readNumber() {

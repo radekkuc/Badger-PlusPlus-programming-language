@@ -2,6 +2,7 @@
 #include "interpreter.h"
 #include <sstream>
 #include <fstream>
+#include "utils.h"
 
 int main(int argc, char** argv){
     try {
@@ -16,33 +17,33 @@ int main(int argc, char** argv){
         Lexer lexer(code);
         std::vector<Token> tokens = lexer.identify();
 
-        // for(Token token : tokens) {
-        //     std::cout << token.value << std::endl;
-        // }
-
-        Parser parser(tokens);
-        std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
-
-        for(const auto& node : nodes) {
-            std::cout << "--------\n"; 
-            std::cout << node->value  << "," << parser.nodeType(node->nodeType) << std::endl;
-            //std::cout << node->left->left->value  << "," << parser.nodeType(node->left->left->nodeType) << std::endl;
-            std::cout << "--------\n";
+        for(Token token : tokens) {
+            std::cout << token.value << std::endl;
         }
-        parser.printAST(nodes);
 
-        Compiler compiler(nodes);
-        compiler.compileProgram();
-        std::unordered_map<std::string, int> variableMap = compiler.getMap();
-        compiler.dumpBytecode();
+        // Parser parser(tokens);
+        // std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
+
+        // for(const auto& node : nodes) {
+        //     std::cout << "--------\n"; 
+        //     std::cout << node->value  << "," << parser.nodeType(node->nodeType) << std::endl;
+        //     //std::cout << node->left->left->value  << "," << parser.nodeType(node->left->left->nodeType) << std::endl;
+        //     std::cout << "--------\n";
+        // }
+        // parser.printAST(nodes);
+        
+        // Compiler compiler(nodes);
+        // compiler.compileProgram();
+        // std::unordered_map<std::string, int> variableMap = compiler.getMap();
+        // compiler.dumpBytecode();
 
         // // for(const auto& pair : variableMap) {
         // //     std::cout << pair.first << "," << pair.second << std::endl; 
         // // }
-
-        std::vector<Instruction> byteCode = compiler.getByteCode();
-        std::vector<Value> constants = compiler.getConstants();
-        int varCount = compiler.getVariableCount();
+        
+        // std::vector<Instruction> byteCode = compiler.getByteCode();
+        // std::vector<Value> constants = compiler.getConstants();
+        // int varCount = compiler.getVariableCount();
 
         // // for (const auto& constant : constants) {
         // //     std::visit([](const auto& v) {
@@ -50,8 +51,9 @@ int main(int argc, char** argv){
         // //     std::cout << v << std::endl;
         // //     }, constant);
         // // }
-        Interpreter interpreter(byteCode, constants, varCount);
-        interpreter.run();
+
+        // Interpreter interpreter(byteCode, constants, varCount);
+        // interpreter.run();
     }
     catch(const std::exception& e) {
         std::cerr << "Exception has occurred: " << e.what() << std::endl; 

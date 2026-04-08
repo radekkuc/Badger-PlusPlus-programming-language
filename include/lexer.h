@@ -33,6 +33,7 @@ public:
     Token readNumber();
     Token readWord();
     char peek();
+    char peekNext();
 
     void skipWhiteSpace();
 };
