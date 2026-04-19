@@ -43,30 +43,25 @@ std::vector<Token> Lexer::identify() {
                 break;
 
             case '|':
-                if(peekNext() == '|') {
-                    tokens.push_back(Token{TokenType::OR, "||"});
-                }
+                if(peekNext() == '|') tokens.push_back(Token{TokenType::OR, "||"});
                 else throw std::runtime_error("Missing second | in logic operation");
                 currIndex_++;
                 break;
 
             case '&':
-                if(peekNext() == '&') {
-                    tokens.push_back(Token{TokenType::AND, "&&"});
-                }
+                if(peekNext() == '&') tokens.push_back(Token{TokenType::AND, "&&"});
                 else throw std::runtime_error("Missing second & in logic operation");
                 currIndex_++;
                 break;
 
-            case '!':
-                tokens.push_back(Token{TokenType::NOT, "!"});
+		    case '!':
+                if(peekNext() == '=') tokens.push_back(Token{TokenType::NCOMPARISON, "!="});
+                else tokens.push_back(Token{TokenType::NOT, "!"});
                 currIndex_++;
                 break;
 
             case '=':
-                if(peekNext() == '=') {
-                    tokens.push_back(Token{TokenType::COMPARISON, "=="});
-                }
+                if(peekNext() == '=') tokens.push_back(Token{TokenType::COMPARISON, "=="});
                 else tokens.push_back(Token{TokenType::EQUALS, "="});
                 currIndex_++;
                 break;

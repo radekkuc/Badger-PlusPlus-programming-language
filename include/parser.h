@@ -40,8 +40,15 @@ public:
     std::unique_ptr<ASTNode> parseElseStatement();
     std::unique_ptr<ASTNode> parseBlock();
 
+    std::unique_ptr<ASTNode> parseOr();
+    std::unique_ptr<ASTNode> parseAnd();
+    std::unique_ptr<ASTNode> parseEquality();
+    std::unique_ptr<ASTNode> parseComparison();
+    std::unique_ptr<ASTNode> parseNot();
 
-    //std::vector<std::unique_ptr<ASTNode>> parseBlock(parameters);
+
+    
+
     Token peek();
     bool match(TokenType type);
     bool needSemicolon(NodeType type);
