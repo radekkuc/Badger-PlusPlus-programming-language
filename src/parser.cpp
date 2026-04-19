@@ -30,6 +30,31 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseExpression() {
+    return parseOr();
+    
+}
+
+std::unique_ptr<ASTNode> Parser::parseOr() {
+
+}
+
+std::unique_ptr<ASTNode> Parser::parseAnd() {
+
+}
+
+std::unique_ptr<ASTNode> Parser::parseEquality() {
+
+}
+
+std::unique_ptr<ASTNode> Parser::parseComparison() {
+
+}
+
+std::unique_ptr<ASTNode> Parser::parseNot() {
+
+}
+
+std::unique_ptr<ASTNode> Parser::parseAddSub() {
     std::unique_ptr<ASTNode> left = parseTerm(); 
     while(match(TokenType::PLUS) || match(TokenType::MINUS)) {
         TokenType signToken = peek().type;
