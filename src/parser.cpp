@@ -31,11 +31,14 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
 
 std::unique_ptr<ASTNode> Parser::parseExpression() {
     return parseOr();
-    
 }
 
 std::unique_ptr<ASTNode> Parser::parseOr() {
+    std::unique_ptr<ASTNode> left = parseAnd();
+    while(match(TokenType::OR)) {
 
+    }
+    return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseAnd() {
