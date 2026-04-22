@@ -17,12 +17,12 @@ int main(int argc, char** argv){
         Lexer lexer(code);
         std::vector<Token> tokens = lexer.identify();
 
-        for(Token token : tokens) {
-            std::cout << token.value << std::endl;
-        }
+        // for(Token token : tokens) {
+        //     std::cout << token.value << std::endl;
+        // }
 
-        // Parser parser(tokens);
-        // std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
+        Parser parser(tokens);
+        std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
 
         // for(const auto& node : nodes) {
         //     std::cout << "--------\n"; 
@@ -30,12 +30,12 @@ int main(int argc, char** argv){
         //     //std::cout << node->left->left->value  << "," << parser.nodeType(node->left->left->nodeType) << std::endl;
         //     std::cout << "--------\n";
         // }
-        // parser.printAST(nodes);
+        parser.printAST(nodes);
         
-        // Compiler compiler(nodes);
-        // compiler.compileProgram();
+        Compiler compiler(nodes);
+        compiler.compileProgram();
         // std::unordered_map<std::string, int> variableMap = compiler.getMap();
-        // compiler.dumpBytecode();
+        compiler.dumpBytecode();
 
         // // for(const auto& pair : variableMap) {
         // //     std::cout << pair.first << "," << pair.second << std::endl; 

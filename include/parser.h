@@ -5,6 +5,7 @@
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
     If, Else, Block,
+    Greater, Smaller, Or, And, Not, Comparison, NComparison,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     Number, Variable, Bool, String
 };
@@ -29,7 +30,8 @@ public:
     explicit Parser(const std::vector<Token>& tokens);
     std::vector<std::unique_ptr<ASTNode>> parseProgram(); // parsing whole program into AST
     std::unique_ptr<ASTNode> parseStatement(); // parsing statements like let, print
-    std::unique_ptr<ASTNode> parseExpression(); // adds/subtracts factors
+    std::unique_ptr<ASTNode> parseExpression(); 
+    std::unique_ptr<ASTNode> parseAddSub();
     std::unique_ptr<ASTNode> parseTerm(); // divides/multiplies factors
     std::unique_ptr<ASTNode> parseFactor(); // the smallest value we can get: x, 10, 10 + 5
 
@@ -45,7 +47,6 @@ public:
     std::unique_ptr<ASTNode> parseEquality();
     std::unique_ptr<ASTNode> parseComparison();
     std::unique_ptr<ASTNode> parseNot();
-
 
     
 
