@@ -36,25 +36,55 @@ std::unique_ptr<ASTNode> Parser::parseExpression() {
 std::unique_ptr<ASTNode> Parser::parseOr() {
     std::unique_ptr<ASTNode> left = parseAnd();
     while(match(TokenType::OR)) {
-
+        advance();
+        std::unique_ptr<ASTNode> right = parseAnd();
+        left = std::make_unique<ASTNode>(NodeType::Or, "Or", std::move(left), std::move(right));
     }
     return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseAnd() {
-
+    std::unique_ptr<ASTNode> left = parseEquality(); 
+    while(match(TokenType::AND)) {
+        advance();
+        std::unique_ptr<ASTNode> right = parseEquality();
+        left = std::make_unique<ASTNode>(NodeType::And, "And", std::move(left), std::move(right));
+    }
+    return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseEquality() {
-
+    std::unique_ptr<ASTNode> left = parseComparison();
+        while(match(TokenType::COMPARISON) || match(TokenType::NCOMPARISON)) {
+        TokenType token = peek().type;
+        advance();
+        std::unique_ptr<ASTNode> right = parseComparison();
+        if(token == TokenType::COMPARISON) left = std::make_unique<ASTNode>(NodeType::Comparison, "Comparison", std::move(left), std::move(right));
+        if(token == TokenType::NCOMPARISON) left = std::make_unique<ASTNode>(NodeType::NComparison, "NComparison", std::move(left), std::move(right));
+    }
+    return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseComparison() {
-
+    std::unique_ptr<ASTNode> left = parseNot();
+    while(match(TokenType::GREATER) || match(TokenType::SMALLER)) {
+        TokenType token = peek().type;
+        advance();
+        std::unique_ptr<ASTNode> right = parseNot();
+        if(token == TokenType::GREATER) left = std::make_unique<ASTNode>(NodeType::Greater, "Greater", std::move(left), std::move(right));
+        if(token == TokenType::SMALLER) left = std::make_unique<ASTNode>(NodeType::Smaller, "Smaller", std::move(left), std::move(right));
+    }
+    return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseNot() {
-
+    std::unique_ptr<ASTNode> left = parseAddSub();
+    while(match(TokenType::NOT)) {
+        advance();
+        std::unique_ptr<ASTNode> right = parseAddSub();
+        left = std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), std::move(right));
+    }
+    return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseAddSub() {

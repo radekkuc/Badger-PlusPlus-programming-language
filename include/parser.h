@@ -5,6 +5,7 @@
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
     If, Else, Block,
+    Greater, Smaller, Or, And, Not, Comparison, NComparison,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     Number, Variable, Bool, String
 };
