@@ -138,8 +138,25 @@ void Compiler::compileNode(const ASTNode* node) {
             compileNode(node->left.get());
             compileNode(node->right.get());
             bytecode.push_back({OpCode::N_EQUAL});
+            break;
 
+        case NodeType::Or:
+            compileNode(node->left.get());
+            compileNode(node->right.get());
+            bytecode.push_back({OpCode::OR});
+            break;
         
+        case NodeType::And:
+            compileNode(node->left.get());
+            compileNode(node->right.get());
+            bytecode.push_back({OpCode::AND});
+            break;
+        
+        case NodeType::Not:
+            compileNode(node->left.get());
+            bytecode.push_back({OpCode::NOT});
+            break;
+
         default:
             break;
     }
@@ -164,6 +181,13 @@ std::string Compiler::opcodeToString(OpCode op) {
         case OpCode::DIV: return "DIV";
         case OpCode::MUL: return "MUL";
         case OpCode::JUMP_IF_FALSE: return "JUMP_IF_FALSE";
+        case OpCode::NOT: return "NOT";
+        case OpCode::GREATER: return "GREATER";
+        case OpCode::SMALLER: return "SMALLER";
+        case OpCode::EQUAL : return "EQUAL";
+        case OpCode::N_EQUAL: return "N_EQUAL";
+        case OpCode::OR: return "OR";
+        case OpCode::AND: return "AND";
         default: return "UNKNOWN";
     }
 }

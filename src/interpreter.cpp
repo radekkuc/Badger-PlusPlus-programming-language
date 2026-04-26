@@ -83,6 +83,13 @@ void Interpreter::run() {
                 div(a,b);
                 break;
             }
+            case OpCode::GREATER:
+            case OpCode::SMALLER:
+            case OpCode::EQUAL:
+            case OpCode::N_EQUAL:
+            case OpCode::NOT:
+            case OpCode::OR:
+            case OpCode::AND:
             default:
                 break;
         }

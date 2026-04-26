@@ -43,25 +43,37 @@ std::vector<Token> Lexer::identify() {
                 break;
 
             case '|':
-                if(peekNext() == '|') tokens.push_back(Token{TokenType::OR, "||"});
+                if(peekNext() == '|') {
+                    currIndex_++;
+                    tokens.push_back(Token{TokenType::OR, "||"});
+                } 
                 else throw std::runtime_error("Missing second | in logic operation");
                 currIndex_++;
                 break;
 
             case '&':
-                if(peekNext() == '&') tokens.push_back(Token{TokenType::AND, "&&"});
+                if(peekNext() == '&') {
+                    currIndex_++;
+                    tokens.push_back(Token{TokenType::AND, "&&"});
+                }     
                 else throw std::runtime_error("Missing second & in logic operation");
                 currIndex_++;
                 break;
 
 		    case '!':
-                if(peekNext() == '=') tokens.push_back(Token{TokenType::NCOMPARISON, "!="});
+                if(peekNext() == '=') {
+                    currIndex_++;
+                    tokens.push_back(Token{TokenType::NCOMPARISON, "!="});
+                } 
                 else tokens.push_back(Token{TokenType::NOT, "!"});
                 currIndex_++;
                 break;
 
             case '=':
-                if(peekNext() == '=') tokens.push_back(Token{TokenType::COMPARISON, "=="});
+                if(peekNext() == '=') {
+                    currIndex_++;
+                    tokens.push_back(Token{TokenType::COMPARISON, "=="});
+                }  
                 else tokens.push_back(Token{TokenType::EQUALS, "="});
                 currIndex_++;
                 break;
@@ -117,8 +129,7 @@ char Lexer::peekNext() {
     int indexHolder = static_cast<int>(currIndex_);
     indexHolder++;
     if(indexHolder >= line_.size()) throw std::runtime_error("Cannot peek next token as it is out of bounds");
-    currIndex_++;
-    return peek();
+    return line_[indexHolder];
 }
 
 Token Lexer::readNumber() {
