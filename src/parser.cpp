@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <stdexcept>
 #include <iostream>
+#include "utils.h"
 
 ASTNode::ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right, std::vector<std::unique_ptr<ASTNode>> statements) : 
 nodeType(nodeType), value(value), left(std::move(left)), right(std::move(right)), statements(std::move(statements)) {};
@@ -78,13 +79,12 @@ std::unique_ptr<ASTNode> Parser::parseComparison() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseNot() {
-    std::unique_ptr<ASTNode> left = parseAddSub();
-    while(match(TokenType::NOT)) {
+    if(match(TokenType::NOT)) {
         advance();
-        std::unique_ptr<ASTNode> right = parseAddSub();
-        left = std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), std::move(right));
+        std::unique_ptr<ASTNode> left = parseNot();
+        return std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), nullptr);
     }
-    return left;
+    return parseAddSub();
 }
 
 std::unique_ptr<ASTNode> Parser::parseAddSub() {

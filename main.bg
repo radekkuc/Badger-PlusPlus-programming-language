@@ -1,9 +1,1 @@
-let x = true;
-let y = false;
-
-if(true) {
-    println("&& if statement");
-}
-
-
-
+let x = !true;

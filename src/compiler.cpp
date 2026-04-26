@@ -115,6 +115,31 @@ void Compiler::compileNode(const ASTNode* node) {
             compileNode(node->right.get());
             bytecode.push_back({OpCode::DIV});
             break;
+        
+        case NodeType::Greater:
+            compileNode(node->left.get());
+            compileNode(node->right.get());
+            bytecode.push_back({OpCode::GREATER});
+            break;
+
+        case NodeType::Smaller:
+            compileNode(node->left.get());
+            compileNode(node->right.get());
+            bytecode.push_back({OpCode::SMALLER});
+            break;
+
+        case NodeType::Comparison:
+            compileNode(node->left.get());
+            compileNode(node->right.get());
+            bytecode.push_back({OpCode::EQUAL});
+            break;
+        
+        case NodeType::NComparison:
+            compileNode(node->left.get());
+            compileNode(node->right.get());
+            bytecode.push_back({OpCode::N_EQUAL});
+
+        
         default:
             break;
     }
