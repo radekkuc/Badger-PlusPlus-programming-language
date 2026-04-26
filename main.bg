@@ -1,4 +1,10 @@
-let x = !true;
-let y = 1 > 7;
-let z = 5 == 5;
-let d = 4 != 6;
+let y = 6;
+let x = 15;
+
+if(x > 10) {
+    println("X is greater than 10");
+}
+
+if(x > y) {
+    println("X is greater than Y");
+}

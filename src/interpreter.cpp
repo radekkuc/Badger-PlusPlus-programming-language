@@ -84,6 +84,13 @@ void Interpreter::run() {
                 break;
             }
             case OpCode::GREATER:
+            {
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                grt(a,b);
+                break;
+            }
+
             case OpCode::SMALLER:
             case OpCode::EQUAL:
             case OpCode::N_EQUAL:
@@ -154,6 +161,19 @@ void Interpreter::div(const Value& a, const Value& b) {
             stack.push_back(static_cast<Type>(v1) / divisor);
         }
         else throw std::runtime_error("Wrong division parameters");
+    }, a, b);
+}
+
+void Interpreter::grt(const Value& a, const Value& b) {
+    std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1) > static_cast<Type>(v2));
+        }
+        else throw std::runtime_error("Wrong parameters for Greater operation");
     }, a, b);
 }
 
