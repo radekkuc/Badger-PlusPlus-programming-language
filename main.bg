@@ -1,16 +1,5 @@
-let x = 10;
-let y = 100;
-let a = true;
-let b = false;
-
-if((x < y) && a) {
-    println("block 1");
-    
-    if((b || (x > 5)) && !(y < 10)) {
-        println("block 3");
-}
-
-}
-
+let y = 10 - 5;
+let x = -6;
+println(y);
 
 

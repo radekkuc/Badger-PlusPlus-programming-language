@@ -7,7 +7,7 @@ enum class NodeType : uint8_t {
     If, Else, Block,
     Greater, Smaller, Or, And, Not, Comparison, NComparison,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
-    Number, Variable, Bool, String
+    UnaryMinus, Number, Variable, Bool, String
 };
 
 struct ASTNode {
@@ -46,7 +46,7 @@ public:
     std::unique_ptr<ASTNode> parseAnd();
     std::unique_ptr<ASTNode> parseEquality();
     std::unique_ptr<ASTNode> parseComparison();
-    std::unique_ptr<ASTNode> parseNot();
+    std::unique_ptr<ASTNode> parseUnary();
 
     
 

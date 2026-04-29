@@ -67,24 +67,15 @@ std::unique_ptr<ASTNode> Parser::parseEquality() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseComparison() {
-    std::unique_ptr<ASTNode> left = parseNot();
+    std::unique_ptr<ASTNode> left = parseAddSub();
     while(match(TokenType::GREATER) || match(TokenType::SMALLER)) {
         TokenType token = peek().type;
         advance();
-        std::unique_ptr<ASTNode> right = parseNot();
+        std::unique_ptr<ASTNode> right = parseAddSub();
         if(token == TokenType::GREATER) left = std::make_unique<ASTNode>(NodeType::Greater, "Greater", std::move(left), std::move(right));
         if(token == TokenType::SMALLER) left = std::make_unique<ASTNode>(NodeType::Smaller, "Smaller", std::move(left), std::move(right));
     }
     return left;
-}
-
-std::unique_ptr<ASTNode> Parser::parseNot() {
-    if(match(TokenType::NOT)) {
-        advance();
-        std::unique_ptr<ASTNode> left = parseNot();
-        return std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), nullptr);
-    }
-    return parseAddSub();
 }
 
 std::unique_ptr<ASTNode> Parser::parseAddSub() {
@@ -100,15 +91,25 @@ std::unique_ptr<ASTNode> Parser::parseAddSub() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseTerm() {
-    std::unique_ptr<ASTNode> left = parseFactor();
+    std::unique_ptr<ASTNode> left = parseUnary();
     while(match(TokenType::ASTERISK) || match(TokenType::SLASH)) {
         TokenType signToken = peek().type;
         advance();
-        std::unique_ptr<ASTNode> right = parseFactor();
+        std::unique_ptr<ASTNode> right = parseUnary();
         if(signToken == TokenType::ASTERISK) left = std::make_unique<ASTNode>(NodeType::Asterisk, "Asterisk", std::move(left), std::move(right));
         if(signToken == TokenType::SLASH) left = std::make_unique<ASTNode>(NodeType::Slash, "Slash", std::move(left), std::move(right));
     } 
     return left;
+}
+
+std::unique_ptr<ASTNode> Parser::parseUnary() {
+    // add unary minus 
+    if(match(TokenType::NOT) || match(TokenType::MINUS)) {
+        advance();
+        std::unique_ptr<ASTNode> left = parseUnary();
+        return std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), nullptr);
+    }
+    return parseFactor();
 }
 
 std::unique_ptr<ASTNode> Parser::parseFactor() {
@@ -226,8 +227,7 @@ Token Parser::peek() {
     return tokens_[currIndex_];
 }
 
-bool Parser::match(TokenType type)
-{
+bool Parser::match(TokenType type) {
     if(currIndex_ >= tokens_.size()) {
         std::cerr << "Cannot check token as it is out of bounds\n";
         return false;
