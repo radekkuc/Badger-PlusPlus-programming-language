@@ -90,13 +90,53 @@ void Interpreter::run() {
                 grt(a,b);
                 break;
             }
-
             case OpCode::SMALLER:
+            {
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                less(a,b);
+                break;
+            }
             case OpCode::EQUAL:
+            {
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                eq(a,b);
+                break;
+            }
             case OpCode::N_EQUAL:
+            {
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                neq(a,b);
+                break;
+            }
             case OpCode::NOT:
+            {
+                Value a = stack.back(); stack.pop_back();
+                if(!std::holds_alternative<bool>(a)) throw std::runtime_error("Parameter must be of boolean type in NOT operation");
+                bool result = !std::get<bool>(a);
+                stack.push_back(result);
+                break;
+            }
             case OpCode::OR:
+            {
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                if(!std::holds_alternative<bool>(b) || !std::holds_alternative<bool>(a)) throw std::runtime_error("Both parameters must be boolean value in OR operation");
+                bool result = std::get<bool>(b) || std::get<bool>(a);
+                stack.push_back(result);
+                break;
+            }
             case OpCode::AND:
+            {
+                Value b = stack.back(); stack.pop_back();
+                Value a = stack.back(); stack.pop_back();
+                if(!std::holds_alternative<bool>(b) || !std::holds_alternative<bool>(a)) throw std::runtime_error("Both parameters must be boolean value in AND operation");
+                bool result = std::get<bool>(b) && std::get<bool>(a);
+                stack.push_back(result);
+                break;
+            }
             default:
                 break;
         }
@@ -177,5 +217,55 @@ void Interpreter::grt(const Value& a, const Value& b) {
     }, a, b);
 }
 
+void Interpreter::less(const Value& a, const Value& b) {
+    std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1) < static_cast<Type>(v2));
+        }
+        else throw std::runtime_error("Wrong parameter for Smaller operation");
+    }, a, b); 
+}
+
+void Interpreter::eq(const Value& a, const Value& b) {
+        std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1) == static_cast<Type>(v2));
+        }
+        else if constexpr(std::is_same_v<V1, bool> && std::is_same_v<V2, bool>) {
+            stack.push_back(v1 == v2);
+        }
+        else if constexpr(std::is_same_v<V1, std::string> && std::is_same_v<V2, std::string> ) {
+            stack.push_back(v1 == v2);
+        }
+        else throw std::runtime_error("Wrong parameter for Equal operation");
+    }, a, b); 
+}
+
+void Interpreter::neq(const Value& a, const Value& b) {
+        std::visit([this](const auto& v1, const auto& v2) {
+        using V1 = std::decay_t<decltype(v1)>;
+        using V2 = std::decay_t<decltype(v2)>;
+
+        if constexpr(is_numeric<V1> && is_numeric<V2>) {
+            using Type = std::common_type_t<V1,V2>;
+            stack.push_back(static_cast<Type>(v1) != static_cast<Type>(v2));
+        }
+        else if constexpr(std::is_same_v<V1, bool> && std::is_same_v<V2, bool>) {
+            stack.push_back(v1 != v2);
+        }
+        else if constexpr(std::is_same_v<V1, std::string> && std::is_same_v<V2, std::string> ) {
+            stack.push_back(v1 != v2);
+        }
+        else throw std::runtime_error("Wrong parameter for Equal operation");
+    }, a, b); 
+}
 
 

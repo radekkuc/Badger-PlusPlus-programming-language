@@ -1,10 +1,16 @@
-let y = 6;
-let x = 15;
+let x = 10;
+let y = 100;
+let a = true;
+let b = false;
 
-if(x > 10) {
-    println("X is greater than 10");
+if((x < y) && a) {
+    println("block 1");
+    
+    if((b || (x > 5)) && !(y < 10)) {
+        println("block 3");
 }
 
-if(x > y) {
-    println("X is greater than Y");
 }
+
+
+

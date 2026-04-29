@@ -34,7 +34,7 @@ int main(int argc, char** argv){
         Compiler compiler(nodes);
         compiler.compileProgram();
         // // std::unordered_map<std::string, int> variableMap = compiler.getMap();
-        // compiler.dumpBytecode();
+        //compiler.dumpBytecode();
 
         // // for(const auto& pair : variableMap) {
         // //     std::cout << pair.first << "," << pair.second << std::endl; 
