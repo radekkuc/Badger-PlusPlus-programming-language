@@ -4,7 +4,7 @@
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
-    If, Else, Block,
+    If, Else, While, Block,
     Greater, Smaller, Or, And, Not, Comparison, NComparison,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     UnaryMinus, Number, Variable, Bool, String
@@ -40,6 +40,7 @@ public:
     std::unique_ptr<ASTNode> parseAssignment();
     std::unique_ptr<ASTNode> parseIfStatement();
     std::unique_ptr<ASTNode> parseElseStatement();
+    std::unique_ptr<ASTNode> parseWhileStatement();
     std::unique_ptr<ASTNode> parseBlock();
 
     std::unique_ptr<ASTNode> parseOr();

@@ -27,6 +27,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     if(match(TokenType::VARIABLE)) return parseAssignment();
     if(match(TokenType::IF)) return parseIfStatement();
     if(match(TokenType::ELSE)) return parseElseStatement();
+    if(match(TokenType::WHILE)) return parseWhileStatement();
     throw std::runtime_error("Unexpected statement: " + peek().value);
 }
 
@@ -192,20 +193,35 @@ std::unique_ptr<ASTNode> Parser::parseAssignment() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseIfStatement() {
+    advance();
+    if(match(TokenType::LPAREN)) {
         advance();
-        if(match(TokenType::LPAREN)) {
+        std::unique_ptr<ASTNode> conditionNode = parseExpression();
+        std::unique_ptr<ASTNode> blockNode;
+        if(match(TokenType::RPAREN)) {
             advance();
-            std::unique_ptr<ASTNode> conditionNode = parseExpression();
-            std::unique_ptr<ASTNode> blockNode;
-            if(match(TokenType::RPAREN)) {
-                advance();
-                if(match(TokenType::LCURLY)) blockNode = parseBlock();        
-                else throw std::runtime_error("Missing opening curly brace in if statement");
-            } 
-            return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode));
-            throw std::runtime_error("Missing closing paren in if statement");
+            if(match(TokenType::LCURLY)) blockNode = parseBlock();        
+            else throw std::runtime_error("Missing opening curly brace in if statement");
+        } 
+        return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode));
+    }
+    throw std::runtime_error("Missing opening paren in if statement");
+}
+
+std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
+    advance();
+    if(match(TokenType::LPAREN)) {
+        advance();
+        std::unique_ptr<ASTNode> conditionNode = parseExpression();
+        std::unique_ptr<ASTNode> blockNode;
+        if(match(TokenType::RPAREN)) {
+            advance();
+            if(match(TokenType::LCURLY)) blockNode = parseBlock();
+            else throw std::runtime_error("Missing opening curly brance in while loop"); 
         }
-        throw std::runtime_error("Missing opening paren in if statement");
+        return std::make_unique<ASTNode>(NodeType::While, "While", std::move(conditionNode), std::move(blockNode));    
+    }
+    throw std::runtime_error("Missing opening paren in while loop");
 }
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
@@ -239,7 +255,11 @@ bool Parser::match(TokenType type) {
 }
 
 bool Parser::needSemicolon(NodeType type) {
-    if(type == NodeType::If) return false;
+    if(type == NodeType::If ||
+        type == NodeType::Else ||
+        type == NodeType::While) {
+        return false;
+       } 
     return true;
 }
 

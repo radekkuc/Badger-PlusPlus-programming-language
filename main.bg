@@ -1,63 +1,7 @@
-let a = -10;
-let b = --10;
-let c = -(-10);
-let d = -(2 + 3) * 4;
-let e = 2 * -3;
-let f = 10 + -5 * 2;
-let g = (-2 + 3) * -(4 + 1);
-let h = !false;
-let i = !!true;
-let j = !(-2 < -1);
-let k = -(-(-3));
-let l = !(true && false);
-let m = (-10 == -10);
-let n = (-10 != 10);
-let o = (-2 * -3) == 6;
-let p = !((-2 * 3) == -6);
-let q = (-2 + -3) * (-4 + 1);
+let x = 0;
 
-println(a);
-println(b);
-println(c);
-println(d);
-println(e);
-println(f);
-println(g);
-println(h);
-println(i);
-println(j);
-println(k);
-println(l);
-println(m);
-println(n);
-println(o);
-println(p);
-println(q);
-
-if(--10 == 10) {
-    println("double unary minus works");
-}
-
-if(-(-10) == 10) {
-    println("nested unary minus works");
-}
-
-if(2 * -3 == -6) {
-    println("right side unary minus works");
-}
-
-if((-2 * -3) == 6) {
-    println("double negative multiplication works");
-}
-
-if(!(-2 < -3)) {
-    println("not with comparison works");
-}
-
-if(!(true && false)) {
-    println("not with logical expression works");
-}
-
-if((-2 + -3) == -5) {
-    println("multiple negative literals work");
+while(x < 10) {
+    x = x + 1;
+    print("Value of x is: ");
+    println(x);
 }

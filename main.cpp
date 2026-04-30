@@ -23,22 +23,22 @@ int main(int argc, char** argv){
         Parser parser(tokens);
         std::vector<std::unique_ptr<ASTNode>> nodes = parser.parseProgram();
 
-        // for(const auto& node : nodes) {
-        //     std::cout << "--------\n"; 
-        //     std::cout << node->value  << "," << parser.nodeType(node->nodeType) << std::endl;
-        //     //std::cout << node->left->left->value  << "," << parser.nodeType(node->left->left->nodeType) << std::endl;
-        //     std::cout << "--------\n";
-        // }
-        // parser.printAST(nodes);
+        // // for(const auto& node : nodes) {
+        // //     std::cout << "--------\n"; 
+        // //     std::cout << node->value  << "," << parser.nodeType(node->nodeType) << std::endl;
+        // //     //std::cout << node->left->left->value  << "," << parser.nodeType(node->left->left->nodeType) << std::endl;
+        // //     std::cout << "--------\n";
+        // // }
+        //parser.printAST(nodes);
         
         Compiler compiler(nodes);
         compiler.compileProgram();
-        // // std::unordered_map<std::string, int> variableMap = compiler.getMap();
-        //compiler.dumpBytecode();
+        // // // std::unordered_map<std::string, int> variableMap = compiler.getMap();
+        compiler.dumpBytecode();
 
-        // // for(const auto& pair : variableMap) {
-        // //     std::cout << pair.first << "," << pair.second << std::endl; 
-        // // }
+        // // // for(const auto& pair : variableMap) {
+        // // //     std::cout << pair.first << "," << pair.second << std::endl; 
+        // // // }
         
         std::vector<Instruction> byteCode = compiler.getByteCode();
         std::vector<Value> constants = compiler.getConstants();

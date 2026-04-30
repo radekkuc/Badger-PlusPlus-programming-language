@@ -46,3 +46,13 @@ println(k);
 
 print("Expression test: ");
 println((3 + 2) * (10 - 4) / 5);
+
+let height;
+
+if(height > 180 || height == 180) {
+    println("Holy I am so big");
+}
+
+if(height < 180) {
+    println("Holy I am so small UwU");
+}

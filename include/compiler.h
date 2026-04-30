@@ -10,7 +10,7 @@ enum class OpCode : uint8_t {
     GREATER, SMALLER, OR, AND, EQUAL, N_EQUAL,
     NOT, UMINUS,
     ADD, SUB, DIV, MUL,
-    JUMP_IF_FALSE, ELSE
+    JUMP_IF_FALSE, JUMP
 };
 
 struct Instruction {
