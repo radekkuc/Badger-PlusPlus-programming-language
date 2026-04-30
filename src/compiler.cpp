@@ -60,7 +60,7 @@ void Compiler::compileNode(const ASTNode* node) {
             break;
 
         case NodeType::Number:
-            {
+        {
             Value val;
             if(node->value.find('.') != std::string::npos) {
                 val = std::stof(node->value);
@@ -72,7 +72,7 @@ void Compiler::compileNode(const ASTNode* node) {
             constants.push_back(val);
             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
             break;
-            }
+        }
 
         case NodeType::Variable:
             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
@@ -156,6 +156,11 @@ void Compiler::compileNode(const ASTNode* node) {
             compileNode(node->left.get());
             bytecode.push_back({OpCode::NOT});
             break;
+        
+        case NodeType::UnaryMinus:
+            compileNode(node->left.get());
+            bytecode.push_back({OpCode::UMINUS});
+            break;
 
         default:
             break;
@@ -182,6 +187,7 @@ std::string Compiler::opcodeToString(OpCode op) {
         case OpCode::MUL: return "MUL";
         case OpCode::JUMP_IF_FALSE: return "JUMP_IF_FALSE";
         case OpCode::NOT: return "NOT";
+        case OpCode::UMINUS: return "UMINUS";
         case OpCode::GREATER: return "GREATER";
         case OpCode::SMALLER: return "SMALLER";
         case OpCode::EQUAL : return "EQUAL";

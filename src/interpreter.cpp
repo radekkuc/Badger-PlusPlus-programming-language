@@ -119,6 +119,18 @@ void Interpreter::run() {
                 stack.push_back(result);
                 break;
             }
+            case OpCode::UMINUS:
+            {
+                Value a = stack.back(); stack.pop_back();
+                std::visit([this](const auto& val) {
+                    using Type = std::decay_t<decltype(val)>;
+                    if constexpr(is_numeric<Type>) {
+                        stack.push_back(-val);
+                    }
+                    else throw std::runtime_error("Parameter must be a number in UMINUS operation");
+                }, a);
+                break;                
+            }
             case OpCode::OR:
             {
                 Value b = stack.back(); stack.pop_back();

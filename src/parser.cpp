@@ -105,9 +105,11 @@ std::unique_ptr<ASTNode> Parser::parseTerm() {
 std::unique_ptr<ASTNode> Parser::parseUnary() {
     // add unary minus 
     if(match(TokenType::NOT) || match(TokenType::MINUS)) {
+        TokenType token = peek().type;
         advance();
         std::unique_ptr<ASTNode> left = parseUnary();
-        return std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), nullptr);
+        if(token == TokenType::NOT) return std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), nullptr);
+        if(token == TokenType::MINUS) return std::make_unique<ASTNode>(NodeType::UnaryMinus, "UnaryMinus", std::move(left), nullptr);
     }
     return parseFactor();
 }
