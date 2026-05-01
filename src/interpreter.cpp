@@ -56,8 +56,8 @@ void Interpreter::run() {
                 break;
             }
             case OpCode::JUMP:
-            {
-                index = byteCode_[index].operand;
+            {   
+                index = byteCode_[index].operand - 1;
                 break;
             }
             case OpCode::ADD:
