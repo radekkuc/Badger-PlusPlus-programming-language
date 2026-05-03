@@ -1,6 +1,6 @@
 #pragma once
 #include "lexer.h"
-#include <memory>
+#include "compiler.h"
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
@@ -10,15 +10,23 @@ enum class NodeType : uint8_t {
     UnaryMinus, Number, Variable, Bool, String
 };
 
-struct ASTNode {
-    NodeType nodeType;
-    std::string value;    
-    std::unique_ptr<ASTNode> left;
-    std::unique_ptr<ASTNode> right;
-    std::vector<std::unique_ptr<ASTNode>> statements;
+// struct ASTNode {
+//     NodeType nodeType;
+//     std::string value;    
+//     std::unique_ptr<ASTNode> left;
+//     std::unique_ptr<ASTNode> right;
+//     std::vector<std::unique_ptr<ASTNode>> statements;
 
-    ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr,
-    std::vector<std::unique_ptr<ASTNode>> statements = {});
+//     ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr,
+//     std::vector<std::unique_ptr<ASTNode>> statements = {});
+// };
+
+class Compiler;
+
+class ASTNode {
+public:
+    virtual void compile(Compiler& compiler) const = 0;
+    ~ASTNode() = default;
 };
 
 class Parser {

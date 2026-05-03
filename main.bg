@@ -1,32 +1,40 @@
 let x = 0;
-while(x < 5) {
-    println(x);
-    x = x + 1;
-}
-
-let y = 3;
-while(y > 0) {
-    println(y);
-    y = y - 1;
-}
-
+let y = 5;
 let flag = true;
-while(flag) {
-    println("flag loop executed once");
-    flag = false;
+
+while(x < 4) {
+    println("outer loop");
+    println(x);
+
+    if(x == 1) {
+        println("x is one");
+    }
+
+    if((x < 3) && flag) {
+        println("flag and x condition passed");
+    }
+
+    while(y > 2) {
+        println("inner loop");
+        println(y);
+
+        if(y == 4) {
+            println("y is four");
+        }
+
+        y = y - 1;
+    }
+
+    if(!(x == 2)) {
+        println("x is not two");
+    }
+
+    x = x + 1;
+    y = 5;
+
+    if(x == 3) {
+        flag = false;
+    }
 }
 
-let a = 0;
-let b = 2;
-while((a < 3) && (b < 5)) {
-    println(a);
-    println(b);
-    a = a + 1;
-    b = b + 1;
-}
-
-let n = 0;
-while(!(n == 3)) {
-    println(n);
-    n = n + 1;
-}
+println("finished");
