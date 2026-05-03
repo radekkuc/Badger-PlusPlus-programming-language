@@ -2,6 +2,7 @@
 #include "parser.h"
 #include <variant>
 #include <unordered_map>
+#include <memory>
 
 // Operation code
 enum class OpCode : uint8_t {

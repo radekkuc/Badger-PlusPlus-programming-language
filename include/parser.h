@@ -1,6 +1,7 @@
 #pragma once
 #include "lexer.h"
 #include "compiler.h"
+#include <memory>
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
@@ -24,10 +25,57 @@ enum class NodeType : uint8_t {
 class Compiler;
 
 class ASTNode {
+protected:
+    NodeType nodeType;
+    std::string value;
 public:
     virtual void compile(Compiler& compiler) const = 0;
-    ~ASTNode() = default;
+    ASTNode(NodeType nodeType, std::string value);
+    virtual ~ASTNode() = default;
 };
+
+class BinaryNode : public ASTNode {
+private:
+    std::unique_ptr<ASTNode> left;
+    std::unique_ptr<ASTNode> right;
+public:
+    void compile(Compiler& compiler) const override;
+    BinaryNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr);
+};
+
+class UnaryNode : public ASTNode {
+private:
+    std::unique_ptr<ASTNode> left;
+public:
+    void compile(Compiler& compiler) const override;
+    UnaryNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left);
+};
+
+class VarDeclNode : public ASTNode {
+
+};
+
+class AssignmentNode : public ASTNode {
+
+};
+
+class PrintNode : public ASTNode {
+
+};
+
+class BlockNode : public ASTNode {
+
+};
+
+class IfNode : public ASTNode {
+
+};
+
+class WhileNode : public ASTNode {
+
+};
+
+
 
 class Parser {
 private:
