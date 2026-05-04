@@ -1,6 +1,5 @@
 #pragma once
 #include "lexer.h"
-#include "compiler.h"
 #include <memory>
 
 enum class NodeType : uint8_t {
@@ -10,17 +9,6 @@ enum class NodeType : uint8_t {
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     UnaryMinus, Number, Variable, Bool, String
 };
-
-// struct ASTNode {
-//     NodeType nodeType;
-//     std::string value;    
-//     std::unique_ptr<ASTNode> left;
-//     std::unique_ptr<ASTNode> right;
-//     std::vector<std::unique_ptr<ASTNode>> statements;
-
-//     ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr,
-//     std::vector<std::unique_ptr<ASTNode>> statements = {});
-// };
 
 class Compiler;
 
@@ -45,37 +33,61 @@ public:
 
 class UnaryNode : public ASTNode {
 private:
-    std::unique_ptr<ASTNode> left;
+    std::unique_ptr<ASTNode> operand;
 public:
     void compile(Compiler& compiler) const override;
     UnaryNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left);
 };
 
 class VarDeclNode : public ASTNode {
-
+private:    
+    std::unique_ptr<ASTNode> expression;
+public:
+    void compile(Compiler& compiler) const override;
+    VarDeclNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> expression = nullptr);
 };
 
 class AssignmentNode : public ASTNode {
-
+private:
+    std::unique_ptr<ASTNode> expression;
+public:
+    void compile(Compiler& compiler) const override;
+    AssignmentNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> expression);
 };
 
 class PrintNode : public ASTNode {
-
+private:
+    std::unique_ptr<ASTNode> expression;
+public:
+    void compile(Compiler& compiler) const override;
+    PrintNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> expression);
 };
 
 class BlockNode : public ASTNode {
-
+private:
+    std::vector<std::unique_ptr<ASTNode>> statementNodes;
+public:
+    void compile(Compiler& compiler) const override;  
+    BlockNode(NodeType nodeType, const std::string& value, std::vector<std::unique_ptr<ASTNode>> statementNodes = {});
 };
 
 class IfNode : public ASTNode {
-
+private:
+    std::unique_ptr<ASTNode> conditionNode;
+    std::unique_ptr<ASTNode> blockNode;
+public:
+    void compile(Compiler& compiler) const override;
+    IfNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode);
 };
 
 class WhileNode : public ASTNode {
-
+private:
+    std::unique_ptr<ASTNode> conditionNode;
+    std::unique_ptr<ASTNode> blockNode;
+public:
+    void compile(Compiler& compiler) const override;
+    WhileNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode);
 };
-
-
 
 class Parser {
 private:
@@ -105,8 +117,6 @@ public:
     std::unique_ptr<ASTNode> parseComparison();
     std::unique_ptr<ASTNode> parseUnary();
 
-    
-
     Token peek();
     bool match(TokenType type);
     bool needSemicolon(NodeType type);
@@ -116,7 +126,5 @@ public:
     void expect(TokenType token, const std::string& errorMessage);
 
     void printAST(const ASTNode* node, int depth = 0);
-    void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);
-
-    
+    void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);  
 };

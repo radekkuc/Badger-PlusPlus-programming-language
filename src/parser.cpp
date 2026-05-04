@@ -104,7 +104,6 @@ std::unique_ptr<ASTNode> Parser::parseTerm() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseUnary() {
-    // add unary minus 
     if(match(TokenType::NOT) || match(TokenType::MINUS)) {
         TokenType token = peek().type;
         advance();
