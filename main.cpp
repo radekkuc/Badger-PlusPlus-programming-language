@@ -32,7 +32,7 @@ int main(int argc, char** argv){
         //parser.printAST(nodes);
         
         Compiler compiler(nodes);
-        compiler.compileProgram();
+        compiler.compileProgram(compiler);
         // // // std::unordered_map<std::string, int> variableMap = compiler.getMap();
         //compiler.dumpBytecode();
 

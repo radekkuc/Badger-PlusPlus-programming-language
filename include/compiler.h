@@ -34,7 +34,7 @@ private:
     void compileNode(const ASTNode* node);
 public:
     explicit Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes);
-    void compileProgram();
+    void compileProgram(Compiler& compiler);
     void dumpBytecode() const;
     std::vector<Instruction> getByteCode() const;
     std::vector<Value> getConstants() const;

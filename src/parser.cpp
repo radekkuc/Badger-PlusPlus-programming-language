@@ -3,10 +3,6 @@
 #include <iostream>
 #include "utils.h"
 
-ASTNode::ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right, std::vector<std::unique_ptr<ASTNode>> statements) : 
-nodeType(nodeType), value(value), left(std::move(left)), right(std::move(right)), statements(std::move(statements)) {};
-
-
 Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens) {}; 
 
 std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {

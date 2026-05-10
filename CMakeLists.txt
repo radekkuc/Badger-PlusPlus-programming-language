@@ -6,6 +6,7 @@ add_executable(Badger++ main.cpp
     src/parser.cpp
     src/compiler.cpp
     src/interpreter.cpp
+    src/astnodes.cpp
 )
 
 include_directories(include)

@@ -179,9 +179,9 @@ void Compiler::compileNode(const ASTNode* node) {
     }
 }
 
-void Compiler::compileProgram() {
+void Compiler::compileProgram(Compiler& compiler) {
     for(const auto& node : nodes_) {
-        compileNode(node.get());
+        node->compile(compiler);
     }
 }
 
