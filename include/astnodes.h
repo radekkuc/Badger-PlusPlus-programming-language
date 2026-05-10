@@ -90,3 +90,21 @@ public:
     void compile(Compiler& compiler) const override;
     WhileNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode);
 };
+
+// CONSTANT
+class ValueNode : public ASTNode {
+private:
+
+public:
+    void compile(Compiler& compiler) const override;
+    ValueNode(NodeType nodeType, const std::string& value);
+};
+
+// LOAD
+class VariableNode : public ASTNode {
+private:
+
+public:
+    void compile(Compiler& compiler) const override;
+    VariableNode(NodeType nodeType, const std::string& value);
+}
