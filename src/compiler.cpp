@@ -4,180 +4,180 @@
 
 Compiler::Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes) : variableCount{}, nodes_(nodes) {};
 
-void Compiler::compileNode(const ASTNode* node) {
-    switch(node->nodeType) {
-        case NodeType::VarDecl:
-            if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
-            if(node->left == nullptr) {
-                variableTable[node->value] = variableCount;
-                initialised[node->value] = false;
-                variableCount++;    
-                break;
-            }
-            variableTable[node->value] = variableCount;
-            compileNode(node->left.get());
-            bytecode.push_back({OpCode::STORE, variableCount});
-            initialised[node->value] = true;
+// void Compiler::compileNode(const ASTNode* node) {
+//     switch(node->nodeType) {
+//         case NodeType::VarDecl:
+//             if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
+//             if(node->left == nullptr) {
+//                 variableTable[node->value] = variableCount;
+//                 initialised[node->value] = false;
+//                 variableCount++;    
+//                 break;
+//             }
+//             variableTable[node->value] = variableCount;
+//             compileNode(node->left.get());
+//             bytecode.push_back({OpCode::STORE, variableCount});
+//             initialised[node->value] = true;
 
-            if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-            variableCount++;
-            break;
+//             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+//             variableCount++;
+//             break;
 
-        case NodeType::Print:
-            compileNode(node->left.get());
-            bytecode.push_back({OpCode::PRINT});
-            break;
+//         case NodeType::Print:
+//             compileNode(node->left.get());
+//             bytecode.push_back({OpCode::PRINT});
+//             break;
 
-        case NodeType::Println:
-            compileNode(node->left.get());
-            bytecode.push_back({OpCode::PRINTLN});
-            break;
+//         case NodeType::Println:
+//             compileNode(node->left.get());
+//             bytecode.push_back({OpCode::PRINTLN});
+//             break;
         
-        case NodeType::If:
-        {   
-            compileNode(node->left.get());
+//         case NodeType::If:
+//         {   
+//             compileNode(node->left.get());
 
-            size_t jumpIndex = bytecode.size();
-            bytecode.push_back({OpCode::JUMP_IF_FALSE, 0});
-            compileNode(node->right.get());
-            bytecode[jumpIndex].operand = bytecode.size();
-            break;
-        }
+//             size_t jumpIndex = bytecode.size();
+//             bytecode.push_back({OpCode::JUMP_IF_FALSE, 0});
+//             compileNode(node->right.get());
+//             bytecode[jumpIndex].operand = bytecode.size();
+//             break;
+//         }
 
-        case NodeType::While:
-        {
-            size_t loopStartIndex = bytecode.size();
-            compileNode(node->left.get());
-            size_t jumpIndexIfFalse = bytecode.size();
-            bytecode.push_back({OpCode::JUMP_IF_FALSE,0});
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::JUMP, static_cast<int>(loopStartIndex)});
-            bytecode[jumpIndexIfFalse].operand = bytecode.size();
-            break;
-        }
+//         case NodeType::While:
+//         {
+//             size_t loopStartIndex = bytecode.size();
+//             compileNode(node->left.get());
+//             size_t jumpIndexIfFalse = bytecode.size();
+//             bytecode.push_back({OpCode::JUMP_IF_FALSE,0});
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::JUMP, static_cast<int>(loopStartIndex)});
+//             bytecode[jumpIndexIfFalse].operand = bytecode.size();
+//             break;
+//         }
 
-        case NodeType::Block:
-        {
-            for(const auto& stm : node->statements) {
-                compileNode(stm.get());
-            }
-            break;
-        }
+//         case NodeType::Block:
+//         {
+//             for(const auto& stm : node->statements) {
+//                 compileNode(stm.get());
+//             }
+//             break;
+//         }
 
-        case NodeType::Assignment:
-            compileNode(node->left.get());
-            if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-            bytecode.push_back({OpCode::STORE, variableTable[node->value]});
-            initialised[node->value] = true;
-            break;
+//         case NodeType::Assignment:
+//             compileNode(node->left.get());
+//             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+//             bytecode.push_back({OpCode::STORE, variableTable[node->value]});
+//             initialised[node->value] = true;
+//             break;
 
-        case NodeType::Number:
-        {
-            Value val;
-            if(node->value.find('.') != std::string::npos) {
-                val = std::stof(node->value);
-            } 
-            else {
-                val = std::stoi(node->value);
+//         case NodeType::Number:
+//         {
+//             Value val;
+//             if(node->value.find('.') != std::string::npos) {
+//                 val = std::stof(node->value);
+//             } 
+//             else {
+//                 val = std::stoi(node->value);
 
-            }
-            constants.push_back(val);
-            bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
-            break;
-        }
+//             }
+//             constants.push_back(val);
+//             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
+//             break;
+//         }
 
-        case NodeType::Variable:
-            if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-            if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
-            bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
-            break;
+//         case NodeType::Variable:
+//             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
+//             if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
+//             bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
+//             break;
         
-        case NodeType::String:
-            constants.push_back(node->value);
-            bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
-            break;
+//         case NodeType::String:
+//             constants.push_back(node->value);
+//             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
+//             break;
             
-        case NodeType::Bool:
-        {
-            bool val = (node->value == "true");  
-            constants.push_back(val);
-            bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
-            break;
-        }
-        case NodeType::Plus:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::ADD});
-            break;
+//         case NodeType::Bool:
+//         {
+//             bool val = (node->value == "true");  
+//             constants.push_back(val);
+//             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
+//             break;
+//         }
+//         case NodeType::Plus:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::ADD});
+//             break;
 
-        case NodeType::Minus:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::SUB});
-            break;
+//         case NodeType::Minus:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::SUB});
+//             break;
 
-        case NodeType::Asterisk:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::MUL});
-            break;
+//         case NodeType::Asterisk:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::MUL});
+//             break;
 
-        case NodeType::Slash:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::DIV});
-            break;
+//         case NodeType::Slash:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::DIV});
+//             break;
         
-        case NodeType::Greater:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::GREATER});
-            break;
+//         case NodeType::Greater:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::GREATER});
+//             break;
 
-        case NodeType::Smaller:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::SMALLER});
-            break;
+//         case NodeType::Smaller:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::SMALLER});
+//             break;
 
-        case NodeType::Comparison:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::EQUAL});
-            break;
+//         case NodeType::Comparison:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::EQUAL});
+//             break;
         
-        case NodeType::NComparison:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::N_EQUAL});
-            break;
+//         case NodeType::NComparison:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::N_EQUAL});
+//             break;
 
-        case NodeType::Or:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::OR});
-            break;
+//         case NodeType::Or:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::OR});
+//             break;
         
-        case NodeType::And:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::AND});
-            break;
+//         case NodeType::And:
+//             compileNode(node->left.get());
+//             compileNode(node->right.get());
+//             bytecode.push_back({OpCode::AND});
+//             break;
         
-        case NodeType::Not:
-            compileNode(node->left.get());
-            bytecode.push_back({OpCode::NOT});
-            break;
+//         case NodeType::Not:
+//             compileNode(node->left.get());
+//             bytecode.push_back({OpCode::NOT});
+//             break;
         
-        case NodeType::UnaryMinus:
-            compileNode(node->left.get());
-            bytecode.push_back({OpCode::UMINUS});
-            break;
+//         case NodeType::UnaryMinus:
+//             compileNode(node->left.get());
+//             bytecode.push_back({OpCode::UMINUS});
+//             break;
 
-        default:
-            break;
-    }
-}
+//         default:
+//             break;
+//     }
+// }
 
 void Compiler::compileProgram(Compiler& compiler) {
     for(const auto& node : nodes_) {
@@ -265,4 +265,8 @@ std::vector<Value> Compiler::getVariables() const {
 
 int Compiler::getVariableCount() const {
     return variableCount;
+}
+
+void Compiler::emit(Instruction instruction) {
+    bytecode.push_back(instruction);
 }

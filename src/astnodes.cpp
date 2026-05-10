@@ -1,16 +1,15 @@
 #include "astnodes.h"
 #include "parser.h"
+#include "compiler.h"
 
 ASTNode::ASTNode(NodeType nodeType, std::string value) : nodeType(nodeType), value(value) {};
 
 void BinaryNode::compile(Compiler& compiler) const {
-    left->compile(compiler);
-    right->compile(compiler);
     switch(nodeType) {
         case NodeType::Plus:
-            compileNode(node->left.get());
-            compileNode(node->right.get());
-            bytecode.push_back({OpCode::ADD});
+            left->compile(compiler);
+            right->compile(compiler);
+            compiler.emit({OpCode::ADD});
             break;
 
         case NodeType::Minus:

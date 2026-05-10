@@ -42,4 +42,5 @@ public:
     std::unordered_map<std::string, int> getMap() const;
     static std::string opcodeToString(OpCode op);
     int getVariableCount() const;
+    void emit(Instruction instruction);
 };
