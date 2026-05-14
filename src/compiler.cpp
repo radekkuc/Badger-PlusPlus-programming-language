@@ -259,14 +259,24 @@ std::vector<Value> Compiler::getConstants() const {
     return constants;
 }
 
-std::vector<Value> Compiler::getVariables() const {
-    return variables;
-}
-
 int Compiler::getVariableCount() const {
     return variableCount;
 }
 
 void Compiler::emit(Instruction instruction) {
     bytecode.push_back(instruction);
+}
+
+bool Compiler::resolveVariable(const std::string& variable) const {
+    if(variableTable.find(variable) != variableTable.end()) return true;
+    return false;
+}
+
+void Compiler::defineVariable(const std::string& value) {
+    variableTable[value] = variableCount;
+    variableCount++;
+}
+
+void Compiler::markInitialized(const std::string& value, bool init) {
+    initialised[value] = init;
 }

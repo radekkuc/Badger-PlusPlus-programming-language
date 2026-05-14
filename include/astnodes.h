@@ -24,6 +24,7 @@ public:
     virtual ~ASTNode() = default;
 };
 
+// + - * /
 class BinaryNode : public ASTNode {
 private:
     std::unique_ptr<ASTNode> left;
@@ -33,14 +34,16 @@ public:
     BinaryNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left = nullptr, std::unique_ptr<ASTNode> right = nullptr);
 };
 
+// ! u-
 class UnaryNode : public ASTNode {
 private:
     std::unique_ptr<ASTNode> operand;
 public:
     void compile(Compiler& compiler) const override;
-    UnaryNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left);
+    UnaryNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> operand);
 };
 
+// let x = 10, let x;
 class VarDeclNode : public ASTNode {
 private:    
     std::unique_ptr<ASTNode> expression;
@@ -107,4 +110,4 @@ private:
 public:
     void compile(Compiler& compiler) const override;
     VariableNode(NodeType nodeType, const std::string& value);
-}
+};

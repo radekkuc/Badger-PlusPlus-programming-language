@@ -27,7 +27,6 @@ private:
     std::vector<Instruction> bytecode;
     std::unordered_map<std::string, int> variableTable;
     std::vector<Value> constants;
-    std::vector<Value> variables;
     std::unordered_map<std::string, bool> initialised;
     int variableCount;
 
@@ -36,11 +35,16 @@ public:
     explicit Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes);
     void compileProgram(Compiler& compiler);
     void dumpBytecode() const;
+
     std::vector<Instruction> getByteCode() const;
     std::vector<Value> getConstants() const;
-    std::vector<Value> getVariables() const;
     std::unordered_map<std::string, int> getMap() const;
+
     static std::string opcodeToString(OpCode op);
+
     int getVariableCount() const;
+    bool resolveVariable(const std::string& variable) const;
+    void defineVariable(const std::string& value);
+    void markInitialized(const std::string& value, bool init = true);
     void emit(Instruction instruction);
 };
