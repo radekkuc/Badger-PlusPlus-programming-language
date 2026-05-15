@@ -3,10 +3,6 @@
 #include <iostream>
 #include "utils.h"
 
-ASTNode::ASTNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right, std::vector<std::unique_ptr<ASTNode>> statements) : 
-nodeType(nodeType), value(value), left(std::move(left)), right(std::move(right)), statements(std::move(statements)) {};
-
-
 Parser::Parser(const std::vector<Token>& tokens) : currIndex_{}, tokens_(tokens) {}; 
 
 std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
@@ -14,7 +10,7 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
     std::vector<std::unique_ptr<ASTNode>> nodes{};
     while(peek().type != TokenType::ENDOFFILE) {
         statementNode = parseStatement();
-        if(needSemicolon(statementNode.get()->nodeType)) expect(TokenType::SEMICOLON, "Missing ; at the end");
+        if(needSemicolon(statementNode->getNodeType())) expect(TokenType::SEMICOLON, "Missing ; at the end");
         advance();
         nodes.emplace_back(std::move(statementNode));
     }
@@ -40,7 +36,7 @@ std::unique_ptr<ASTNode> Parser::parseOr() {
     while(match(TokenType::OR)) {
         advance();
         std::unique_ptr<ASTNode> right = parseAnd();
-        left = std::make_unique<ASTNode>(NodeType::Or, "Or", std::move(left), std::move(right));
+        left = std::make_unique<BinaryNode>(NodeType::Or, "Or", std::move(left), std::move(right));
     }
     return left;
 }
@@ -50,7 +46,7 @@ std::unique_ptr<ASTNode> Parser::parseAnd() {
     while(match(TokenType::AND)) {
         advance();
         std::unique_ptr<ASTNode> right = parseEquality();
-        left = std::make_unique<ASTNode>(NodeType::And, "And", std::move(left), std::move(right));
+        left = std::make_unique<BinaryNode>(NodeType::And, "And", std::move(left), std::move(right));
     }
     return left;
 }
@@ -61,8 +57,8 @@ std::unique_ptr<ASTNode> Parser::parseEquality() {
         TokenType token = peek().type;
         advance();
         std::unique_ptr<ASTNode> right = parseComparison();
-        if(token == TokenType::COMPARISON) left = std::make_unique<ASTNode>(NodeType::Comparison, "Comparison", std::move(left), std::move(right));
-        if(token == TokenType::NCOMPARISON) left = std::make_unique<ASTNode>(NodeType::NComparison, "NComparison", std::move(left), std::move(right));
+        if(token == TokenType::COMPARISON) left = std::make_unique<BinaryNode>(NodeType::Comparison, "Comparison", std::move(left), std::move(right));
+        if(token == TokenType::NCOMPARISON) left = std::make_unique<BinaryNode>(NodeType::NComparison, "NComparison", std::move(left), std::move(right));
     }
     return left;
 }
@@ -73,8 +69,8 @@ std::unique_ptr<ASTNode> Parser::parseComparison() {
         TokenType token = peek().type;
         advance();
         std::unique_ptr<ASTNode> right = parseAddSub();
-        if(token == TokenType::GREATER) left = std::make_unique<ASTNode>(NodeType::Greater, "Greater", std::move(left), std::move(right));
-        if(token == TokenType::SMALLER) left = std::make_unique<ASTNode>(NodeType::Smaller, "Smaller", std::move(left), std::move(right));
+        if(token == TokenType::GREATER) left = std::make_unique<BinaryNode>(NodeType::Greater, "Greater", std::move(left), std::move(right));
+        if(token == TokenType::SMALLER) left = std::make_unique<BinaryNode>(NodeType::Smaller, "Smaller", std::move(left), std::move(right));
     }
     return left;
 }
@@ -85,8 +81,8 @@ std::unique_ptr<ASTNode> Parser::parseAddSub() {
         TokenType signToken = peek().type;
         advance();
         std::unique_ptr<ASTNode> right = parseTerm();
-        if(signToken == TokenType::PLUS) left = std::make_unique<ASTNode>(NodeType::Plus, "Plus", std::move(left), std::move(right));  
-        if(signToken == TokenType::MINUS) left = std::make_unique<ASTNode>(NodeType::Minus, "Minus", std::move(left), std::move(right)); 
+        if(signToken == TokenType::PLUS) left = std::make_unique<BinaryNode>(NodeType::Plus, "Plus", std::move(left), std::move(right));  
+        if(signToken == TokenType::MINUS) left = std::make_unique<BinaryNode>(NodeType::Minus, "Minus", std::move(left), std::move(right)); 
     }
     return left;
 }
@@ -97,27 +93,26 @@ std::unique_ptr<ASTNode> Parser::parseTerm() {
         TokenType signToken = peek().type;
         advance();
         std::unique_ptr<ASTNode> right = parseUnary();
-        if(signToken == TokenType::ASTERISK) left = std::make_unique<ASTNode>(NodeType::Asterisk, "Asterisk", std::move(left), std::move(right));
-        if(signToken == TokenType::SLASH) left = std::make_unique<ASTNode>(NodeType::Slash, "Slash", std::move(left), std::move(right));
+        if(signToken == TokenType::ASTERISK) left = std::make_unique<BinaryNode>(NodeType::Asterisk, "Asterisk", std::move(left), std::move(right));
+        if(signToken == TokenType::SLASH) left = std::make_unique<BinaryNode>(NodeType::Slash, "Slash", std::move(left), std::move(right));
     } 
     return left;
 }
 
 std::unique_ptr<ASTNode> Parser::parseUnary() {
-    // add unary minus 
     if(match(TokenType::NOT) || match(TokenType::MINUS)) {
         TokenType token = peek().type;
         advance();
         std::unique_ptr<ASTNode> left = parseUnary();
-        if(token == TokenType::NOT) return std::make_unique<ASTNode>(NodeType::Not, "Not", std::move(left), nullptr);
-        if(token == TokenType::MINUS) return std::make_unique<ASTNode>(NodeType::UnaryMinus, "UnaryMinus", std::move(left), nullptr);
+        if(token == TokenType::NOT) return std::make_unique<UnaryNode>(NodeType::Not, "Not", std::move(left));
+        if(token == TokenType::MINUS) return std::make_unique<UnaryNode>(NodeType::UnaryMinus, "UnaryMinus", std::move(left));
     }
     return parseFactor();
 }
 
 std::unique_ptr<ASTNode> Parser::parseFactor() {
     if(match(TokenType::NUMBER)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Number, peek().value); 
+        std::unique_ptr<ASTNode> node = std::make_unique<ValueNode>(NodeType::Number, peek().value); 
         advance();
         return node;
     }
@@ -131,19 +126,19 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
     }
 
     if(match(TokenType::VARIABLE)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Variable, peek().value); 
+        std::unique_ptr<ASTNode> node = std::make_unique<VariableNode>(NodeType::Variable, peek().value); 
         advance(); 
         return node; 
     }
 
     if(match(TokenType::BOOL)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::Bool, peek().value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ValueNode>(NodeType::Bool, peek().value);
         advance();
         return node;
     }
 
     if(match(TokenType::STRING)) {
-        std::unique_ptr<ASTNode> node = std::make_unique<ASTNode>(NodeType::String, peek().value);
+        std::unique_ptr<ASTNode> node = std::make_unique<ValueNode>(NodeType::String, peek().value);
         advance();
         return node;
     }
@@ -158,10 +153,10 @@ std::unique_ptr<ASTNode> Parser::parseLetStatement() {
             if(match(TokenType::EQUALS)) {
                 advance();
                 std::unique_ptr<ASTNode> expressionNode = parseExpression();
-                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value, std::move(expressionNode));            
+                return std::make_unique<VarDeclNode>(NodeType::VarDecl, variableToken.value, std::move(expressionNode));            
             }
             else {
-                return std::make_unique<ASTNode>(NodeType::VarDecl, variableToken.value);
+                return std::make_unique<VarDeclNode>(NodeType::VarDecl, variableToken.value);
             }      
         }
         else throw std::runtime_error("Expected variable declaration but got: " + peek().value);
@@ -175,8 +170,8 @@ std::unique_ptr<ASTNode> Parser::parsePrintStatement() {
             std::unique_ptr<ASTNode> node = parseExpression();
             expect(TokenType::RPAREN, "Missing closing paren");
             advance();
-            if(printToken == TokenType::PRINT) return std::make_unique<ASTNode>(NodeType::Print, "Print", std::move(node));
-            else if(printToken == TokenType::PRINTLN) return std::make_unique<ASTNode>(NodeType::Println, "Println", std::move(node));
+            if(printToken == TokenType::PRINT) return std::make_unique<PrintNode>(NodeType::Print, "Print", std::move(node));
+            else if(printToken == TokenType::PRINTLN) return std::make_unique<PrintNode>(NodeType::Println, "Println", std::move(node));
         }
         throw std::runtime_error("Missing open paren");
 }
@@ -187,7 +182,7 @@ std::unique_ptr<ASTNode> Parser::parseAssignment() {
         if(match(TokenType::EQUALS)) {
             advance();
             std::unique_ptr<ASTNode> node = parseExpression();
-            return std::make_unique<ASTNode>(NodeType::Assignment, token.value, std::move(node));
+            return std::make_unique<AssignmentNode>(NodeType::Assignment, token.value, std::move(node));
         }
         throw std::runtime_error("Expected variable assigment but got: " + peek().value);
 }
@@ -203,7 +198,7 @@ std::unique_ptr<ASTNode> Parser::parseIfStatement() {
             if(match(TokenType::LCURLY)) blockNode = parseBlock();        
             else throw std::runtime_error("Missing opening curly brace in if statement");
         } 
-        return std::make_unique<ASTNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode));
+        return std::make_unique<IfNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode));
     }
     throw std::runtime_error("Missing opening paren in if statement");
 }
@@ -219,7 +214,7 @@ std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
             if(match(TokenType::LCURLY)) blockNode = parseBlock();
             else throw std::runtime_error("Missing opening curly brance in while loop"); 
         }
-        return std::make_unique<ASTNode>(NodeType::While, "While", std::move(conditionNode), std::move(blockNode));    
+        return std::make_unique<WhileNode>(NodeType::While, "While", std::move(conditionNode), std::move(blockNode));    
     }
     throw std::runtime_error("Missing opening paren in while loop");
 }
@@ -229,12 +224,12 @@ std::unique_ptr<ASTNode> Parser::parseBlock() {
     advance();
     while(!match(TokenType::RCURLY)) {
         std::unique_ptr<ASTNode> bodyNode = parseStatement();
-        if(needSemicolon(bodyNode.get()->nodeType)) expect(TokenType::SEMICOLON, "Missing semicolon in if statement");
+        if(needSemicolon(bodyNode->getNodeType())) expect(TokenType::SEMICOLON, "Missing semicolon in if statement");
         advance();
         statementNodes.emplace_back(std::move(bodyNode));
         }
     expect(TokenType::RCURLY, "Missing closing curly brace in statement");
-    return std::make_unique<ASTNode>(NodeType::Block, "Block", nullptr, nullptr, std::move(statementNodes));
+    return std::make_unique<BlockNode>(NodeType::Block, "Block", std::move(statementNodes));
 }
 
 std::unique_ptr<ASTNode> Parser::parseElseStatement() {
@@ -272,29 +267,29 @@ void Parser::expect(TokenType token, const std::string &errorMessage) {
     if(!match(token)) throw std::runtime_error(errorMessage);
 }
 
-void Parser::printAST(const ASTNode* node, int depth) {
-    if (!node) return;
-    for (int i = 0; i < depth; i++) std::cout << "  ";
+// void Parser::printAST(const ASTNode* node, int depth) {
+//     if (!node) return;
+//     for (int i = 0; i < depth; i++) std::cout << "  ";
 
-    std::cout << " (" << node->value << ")\n";
-    if (node->left) {
-        std::cout << std::string(depth * 2, ' ') << "Left: \n";
-        printAST(node->left.get(), depth + 1);
-    }
-    if (node->right) {
-        std::cout << std::string(depth * 2, ' ') << "Right: \n";
-        printAST(node->right.get(), depth + 1);
-    }
-}
+//     std::cout << " (" << node->value << ")\n";
+//     if (node->left) {
+//         std::cout << std::string(depth * 2, ' ') << "Left: \n";
+//         printAST(node->left.get(), depth + 1);
+//     }
+//     if (node->right) {
+//         std::cout << std::string(depth * 2, ' ') << "Right: \n";
+//         printAST(node->right.get(), depth + 1);
+//     }
+// }
 
-void Parser::printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes) {
-    std::cout << "Program AST:\n";
+// void Parser::printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes) {
+//     std::cout << "Program AST:\n";
 
-    for (size_t i = 0; i < nodes.size(); ++i) {
-        std::cout << "\nStatement " << i + 1 << ":\n";
-        printAST(nodes[i].get(), 1);
-    }
-}
+//     for (size_t i = 0; i < nodes.size(); ++i) {
+//         std::cout << "\nStatement " << i + 1 << ":\n";
+//         printAST(nodes[i].get(), 1);
+//     }
+// }
 
 
 const char* Parser::tokenType(TokenType type) {

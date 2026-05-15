@@ -1,32 +1,25 @@
-let x = 0;
-while(x < 5) {
-    println(x);
-    x = x + 1;
+let a = 50.0;
+let b = 100.0;
+let operation = "+";
+
+
+if(operation == "+") {
+    println(a + b);
 }
 
-let y = 3;
-while(y > 0) {
-    println(y);
-    y = y - 1;
+if(operation == "-") {
+    println(a - b);
 }
 
-let flag = true;
-while(flag) {
-    println("flag loop executed once");
-    flag = false;
+if(operation == "*") {
+    println(a * b);
 }
 
-let a = 0;
-let b = 2;
-while((a < 3) && (b < 5)) {
-    println(a);
-    println(b);
-    a = a + 1;
-    b = b + 1;
-}
-
-let n = 0;
-while(!(n == 3)) {
-    println(n);
-    n = n + 1;
+if(operation == "/") {
+    if(b != 0) {
+        println(a / b);
+    }
+    if(b == 0) {
+        println("Cannot divide by 0");
+    }
 }
