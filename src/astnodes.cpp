@@ -97,6 +97,7 @@ UnaryNode::UnaryNode(NodeType nodeType, const std::string& value, std::unique_pt
 void VarDeclNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::VarDecl:
+        {
             if(compiler.resolveVariable(value)) throw std::runtime_error("Variable " + value + " already exists"); 
             if(expression == nullptr) {
                 compiler.defineVariable(value);
@@ -111,10 +112,149 @@ void VarDeclNode::compile(Compiler& compiler) const {
 
             if(!compiler.resolveVariable(value)) throw std::runtime_error("Undefined variable: " + value);
             break;
-        
+        }
         default:
             break;
     }
 }
 
 VarDeclNode::VarDeclNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> expression) : ASTNode(nodeType, value), expression(std::move(expression)) {};
+
+void AssignmentNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::Assignment:
+            expression->compile(compiler);
+            if(!compiler.resolveVariable(value)) throw std::runtime_error("Undefined variable: " + value);
+            compiler.emit({OpCode::STORE, compiler.getInstrOperand(value)});
+            compiler.markInitialized(value);
+            break;
+        
+        default:
+            break;
+    }
+}
+
+AssignmentNode::AssignmentNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> expression) : ASTNode(nodeType, value), expression(std::move(expression)) {};
+
+void PrintNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::Print:
+            expression->compile(compiler);
+            compiler.emit({OpCode::PRINT});
+            break;
+
+        case NodeType::Println:
+            expression->compile(compiler);
+            compiler.emit({OpCode::PRINTLN});
+            break;
+        
+        default:
+            break;
+    }
+}
+
+PrintNode::PrintNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> expression) : ASTNode(nodeType, value), expression(std::move(expression)) {};
+
+void BlockNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::Block:
+        {
+            for(const auto& stm : statementNodes) {
+                stm->compile(compiler);
+            }
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+BlockNode::BlockNode(NodeType nodeType, const std::string& value, std::vector<std::unique_ptr<ASTNode>> statementNodes) : ASTNode(nodeType, value), statementNodes(std::move(statementNodes)) {};
+
+void IfNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::If:
+        {   
+            conditionNode->compile(compiler);
+
+            size_t jumpIndex = compiler.getByteCodeSize();
+            compiler.emit({OpCode::JUMP_IF_FALSE, 0});
+            blockNode->compile(compiler);
+            compiler.setInstrOperand(jumpIndex, compiler.getByteCodeSize());
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+IfNode::IfNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), conditionNode(std::move(conditionNode)), blockNode(std::move(blockNode)) {};
+
+void WhileNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::While:
+        {
+            size_t loopStartIndex = compiler.getByteCodeSize();
+            conditionNode->compile(compiler);
+            size_t jumpIndexIfFalse = compiler.getByteCodeSize();
+            compiler.emit({OpCode::JUMP_IF_FALSE, 0});
+            blockNode->compile(compiler);
+            compiler.emit({OpCode::JUMP, static_cast<int>(loopStartIndex)});
+            compiler.setInstrOperand(jumpIndexIfFalse, compiler.getByteCodeSize());
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+WhileNode::WhileNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), conditionNode(std::move(conditionNode)), blockNode(std::move(blockNode)) {};
+
+void ValueNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::Number:
+        {
+            Value val;
+            if(value.find('.') != std::string::npos) {
+                val = std::stof(value);
+            } 
+            else {
+                val = std::stoi(value);
+
+            }
+            compiler.addConstant(val);
+            compiler.emit({OpCode::CONSTANT, static_cast<int>(compiler.getConstantsSize()) - 1});
+            break;
+        }
+        
+        case NodeType::String:
+            compiler.addConstant(value);
+            compiler.emit({OpCode::CONSTANT, static_cast<int>(compiler.getConstantsSize()) - 1});
+            break;
+            
+        case NodeType::Bool:
+        {
+            bool val = (value == "true");  
+            compiler.addConstant(val);
+            compiler.emit({OpCode::CONSTANT, static_cast<int>(compiler.getConstantsSize()) - 1});
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+ValueNode::ValueNode(NodeType nodeType, const std::string& value) : ASTNode(nodeType, value) {};
+
+void VariableNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::Variable:
+            if(!compiler.resolveVariable(value)) throw std::runtime_error("Undefined variable: " + value);
+            if(!compiler.isInitialized(value)) throw std::runtime_error("Using uninitialised variable: " + value);
+            compiler.emit({OpCode::LOAD, compiler.getInstrOperand(value)});
+            break;
+    }
+}
+
+VariableNode::VariableNode(NodeType nodeType, const std::string& value) : ASTNode(nodeType, value) {};

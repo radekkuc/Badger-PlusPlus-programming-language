@@ -179,9 +179,9 @@ Compiler::Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes) : variabl
 //     }
 // }
 
-void Compiler::compileProgram(Compiler& compiler) {
+void Compiler::compileProgram() {
     for(const auto& node : nodes_) {
-        node->compile(compiler);
+        node->compile(*this);
     }
 }
 
@@ -259,12 +259,20 @@ std::vector<Value> Compiler::getConstants() const {
     return constants;
 }
 
+size_t Compiler::getByteCodeSize() const {
+    return bytecode.size();
+}
+
+size_t Compiler::getConstantsSize() const {
+    return constants.size();
+}
+
 int Compiler::getVariableCount() const {
     return variableCount;
 }
 
-void Compiler::emit(Instruction instruction) {
-    bytecode.push_back(instruction);
+int Compiler::getInstrOperand(const std::string& value) {
+    return variableTable[value];
 }
 
 bool Compiler::resolveVariable(const std::string& variable) const {
@@ -272,11 +280,29 @@ bool Compiler::resolveVariable(const std::string& variable) const {
     return false;
 }
 
+bool Compiler::isInitialized(const std::string& value) {
+    return initialised[value];
+}
+
 void Compiler::defineVariable(const std::string& value) {
     variableTable[value] = variableCount;
     variableCount++;
 }
 
+void Compiler::addConstant(const Value& constant) {
+    constants.push_back(constant);
+}
+
 void Compiler::markInitialized(const std::string& value, bool init) {
     initialised[value] = init;
 }
+
+void Compiler::emit(Instruction instruction) {
+    bytecode.push_back(instruction);
+}
+
+void Compiler::setInstrOperand(int op, int val) {
+    bytecode[op].operand = val;
+}
+
+
