@@ -39,6 +39,6 @@ public:
     void advance();
     void expect(TokenType token, const std::string& errorMessage);
 
-    void printAST(const ASTNode* node, int depth = 0);
-    void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);  
+    //void printAST(const ASTNode* node, int depth = 0);
+    //void printAST(const std::vector<std::unique_ptr<ASTNode>>& nodes);  
 };

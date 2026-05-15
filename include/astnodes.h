@@ -21,6 +21,7 @@ protected:
 public:
     virtual void compile(Compiler& compiler) const = 0;
     ASTNode(NodeType nodeType, std::string value);
+    NodeType getNodeType() const;
     virtual ~ASTNode() = default;
 };
 

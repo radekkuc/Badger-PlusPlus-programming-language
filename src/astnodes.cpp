@@ -5,6 +5,10 @@
 
 ASTNode::ASTNode(NodeType nodeType, std::string value) : nodeType(nodeType), value(value) {};
 
+NodeType ASTNode::getNodeType() const {
+    return nodeType;
+}
+
 void BinaryNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::Plus:
