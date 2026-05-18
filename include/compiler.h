@@ -19,15 +19,21 @@ struct Instruction {
     int operand = 0;
 };
 
+struct VariableInfo {
+    int operand;
+    bool initialized;
+};
+
 using Value = std::variant<int, std::string, float, bool>;
 
 class Compiler {
 private:
     const std::vector<std::unique_ptr<ASTNode>>& nodes_;
+    std::vector<std::unordered_map<std::string, VariableInfo>> variableTable;
     std::vector<Instruction> bytecode;
-    std::unordered_map<std::string, int> variableTable;
+    //std::unordered_map<std::string, int> variableTable;
     std::vector<Value> constants;
-    std::unordered_map<std::string, bool> initialised;
+    //std::unordered_map<std::string, bool> initialised;
     int variableCount;
 public:
     explicit Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes);

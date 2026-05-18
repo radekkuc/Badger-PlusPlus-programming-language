@@ -1,6 +1,6 @@
 let a = 50.0;
-let b = 100.0;
-let operation = "+";
+let b = 0;
+let operation = "/";
 
 
 if(operation == "+") {
