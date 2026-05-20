@@ -36,6 +36,11 @@ std::string Compiler::opcodeToString(OpCode op) {
     }
 }
 
+std::ostream& operator<<(std::ostream& o, const VariableInfo& v) {
+    o << v.operand;
+    return o;
+}
+
 void Compiler::dumpBytecode() const {
     std::cout << "\n==== BYTECODE ====\n";
 
@@ -62,7 +67,7 @@ void Compiler::dumpBytecode() const {
 
     std::cout << "\nVariables:\n";
 
-    for(const auto& [name, slot] : variableTable) {
+    for(const auto& [name, slot] : variableTable.back()) {
         std::cout << name << " -> slot " << slot << "\n";
     }
 
@@ -71,9 +76,9 @@ void Compiler::dumpBytecode() const {
 
 
 
-std::unordered_map<std::string, int> Compiler::getMap() const {
-    return variableTable;
-}
+// std::unordered_map<std::string, int> Compiler::getMap() const {
+//     return variableTable;
+// }
 
 std::vector<Instruction> Compiler::getByteCode() const {
     return bytecode;
@@ -97,20 +102,20 @@ int Compiler::getVariableCount() const {
 }
 
 int Compiler::getInstrOperand(const std::string& value) {
-    return variableTable[value];
+    return variableTable.back()[value].operand;
 }
 
 bool Compiler::resolveVariable(const std::string& variable) const {
-    if(variableTable.find(variable) != variableTable.end()) return true;
+    if(variableTable.back().find(variable) != variableTable.back().end()) return true;
     return false;
 }
 
 bool Compiler::isInitialized(const std::string& value) {
-    return initialised[value];
+    return variableTable.back()[value].initialized;
 }
 
 void Compiler::defineVariable(const std::string& value) {
-    variableTable[value] = variableCount;
+    variableTable.back()[value].operand = variableCount;
     variableCount++;
 }
 
@@ -119,7 +124,7 @@ void Compiler::addConstant(const Value& constant) {
 }
 
 void Compiler::markInitialized(const std::string& value, bool init) {
-    initialised[value] = init;
+    variableTable.back()[value].initialized = init;
 }
 
 void Compiler::emit(Instruction instruction) {
@@ -128,6 +133,15 @@ void Compiler::emit(Instruction instruction) {
 
 void Compiler::setInstrOperand(int op, int val) {
     bytecode[op].operand = val;
+}
+
+void Compiler::enterScope() {
+    std::unordered_map<std::string, VariableInfo> map;
+    variableTable.push_back(map);
+}
+
+void Compiler::leaveScope() {
+    variableTable.pop_back();
 }
 
 

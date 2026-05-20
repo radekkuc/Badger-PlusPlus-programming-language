@@ -163,9 +163,11 @@ void BlockNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::Block:
         {
+            compiler.enterScope();
             for(const auto& stm : statementNodes) {
                 stm->compile(compiler);
             }
+            compiler.leaveScope();
             break;
         }
 
