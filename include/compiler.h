@@ -51,7 +51,8 @@ public:
     int getVariableCount() const;
     int getInstrOperand(const std::string& value);
 
-    bool resolveVariable(const std::string& variable) const;
+    bool resolveVariableAnyScope(const std::string& variable) const;
+    bool resolveVariableCurrentScope(const std::string& variable) const;
     bool isInitialized(const std::string& value);
 
     void defineVariable(const std::string& value);

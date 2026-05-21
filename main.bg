@@ -1,25 +1,13 @@
-let a = 50.0;
-let b = 0;
-let operation = "/";
+let x = 10;
+print("Value of x in global scope is: ");
+println(x);
 
-
-if(operation == "+") {
-    println(a + b);
+if(x == 10) {
+    let x;
+    print("Value of x in inner scope is: ");
+    println(x);
 }
 
-if(operation == "-") {
-    println(a - b);
-}
+print("Value of x out of inner scope is: ");
+println(x);
 
-if(operation == "*") {
-    println(a * b);
-}
-
-if(operation == "/") {
-    if(b != 0) {
-        println(a / b);
-    }
-    if(b == 0) {
-        println("Cannot divide by 0");
-    }
-}

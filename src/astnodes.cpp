@@ -102,7 +102,7 @@ void VarDeclNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::VarDecl:
         {
-            if(compiler.resolveVariable(value)) throw std::runtime_error("Variable " + value + " already exists"); 
+            if(compiler.resolveVariableCurrentScope(value)) throw std::runtime_error("Variable " + value + " already exists"); 
             if(expression == nullptr) {
                 compiler.defineVariable(value);
                 compiler.markInitialized(value, false);
@@ -114,7 +114,7 @@ void VarDeclNode::compile(Compiler& compiler) const {
             compiler.emit({OpCode::STORE, operand});
             compiler.markInitialized(value);
 
-            if(!compiler.resolveVariable(value)) throw std::runtime_error("Undefined variable: " + value);
+            if(!compiler.resolveVariableAnyScope(value)) throw std::runtime_error("Undefined variable: " + value);
             break;
         }
         default:
@@ -128,7 +128,7 @@ void AssignmentNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::Assignment:
             expression->compile(compiler);
-            if(!compiler.resolveVariable(value)) throw std::runtime_error("Undefined variable: " + value);
+            if(!compiler.resolveVariableAnyScope(value)) throw std::runtime_error("Undefined variable: " + value);
             compiler.emit({OpCode::STORE, compiler.getInstrOperand(value)});
             compiler.markInitialized(value);
             break;
@@ -256,7 +256,7 @@ ValueNode::ValueNode(NodeType nodeType, const std::string& value) : ASTNode(node
 void VariableNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::Variable:
-            if(!compiler.resolveVariable(value)) throw std::runtime_error("Undefined variable: " + value);
+            if(!compiler.resolveVariableAnyScope(value)) throw std::runtime_error("Undefined variable: " + value);
             if(!compiler.isInitialized(value)) throw std::runtime_error("Using uninitialised variable: " + value);
             compiler.emit({OpCode::LOAD, compiler.getInstrOperand(value)});
             break;

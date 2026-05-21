@@ -84,7 +84,6 @@ std::vector<Instruction> Compiler::getByteCode() const {
     return bytecode;
 }
 
-
 std::vector<Value> Compiler::getConstants() const {
     return constants;
 }
@@ -105,7 +104,14 @@ int Compiler::getInstrOperand(const std::string& value) {
     return variableTable.back()[value].operand;
 }
 
-bool Compiler::resolveVariable(const std::string& variable) const {
+bool Compiler::resolveVariableAnyScope(const std::string& variable) const {
+    for(size_t i = variableTable.size(); i > 0; i--) {
+        if(variableTable[i - 1].find(variable) != variableTable[i - 1].end()) return true;
+    }
+    return false;
+}
+
+bool Compiler::resolveVariableCurrentScope(const std::string& variable) const {
     if(variableTable.back().find(variable) != variableTable.back().end()) return true;
     return false;
 }
