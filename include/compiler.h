@@ -24,7 +24,7 @@ struct VariableInfo {
     bool initialized;
 };
 
-std::ostream& operator<<(std::ostream& o, const VariableInfo* v);
+std::ostream& operator<<(std::ostream& o, const VariableInfo& v);
 
 using Value = std::variant<int, std::string, float, bool>;
 

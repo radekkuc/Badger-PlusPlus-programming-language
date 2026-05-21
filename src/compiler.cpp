@@ -5,6 +5,8 @@
 Compiler::Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes) : variableCount{}, nodes_(nodes) {};
 
 void Compiler::compileProgram() {
+    std::unordered_map<std::string, VariableInfo> globalScope;
+    variableTable.emplace_back(globalScope);
     for(const auto& node : nodes_) {
         node->compile(*this);
     }
@@ -74,8 +76,6 @@ void Compiler::dumpBytecode() const {
     std::cout << "\nVariable count: " << variableCount << "\n";
 }
 
-
-
 // std::unordered_map<std::string, int> Compiler::getMap() const {
 //     return variableTable;
 // }
@@ -137,7 +137,7 @@ void Compiler::setInstrOperand(int op, int val) {
 
 void Compiler::enterScope() {
     std::unordered_map<std::string, VariableInfo> map;
-    variableTable.push_back(map);
+    variableTable.emplace_back(map);
 }
 
 void Compiler::leaveScope() {
