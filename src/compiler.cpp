@@ -4,182 +4,9 @@
 
 Compiler::Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes) : variableCount{}, nodes_(nodes) {};
 
-// void Compiler::compileNode(const ASTNode* node) {
-//     switch(node->nodeType) {
-//         case NodeType::VarDecl:
-//             if(variableTable.find(node->value) != variableTable.end()) throw std::runtime_error("Variable " + node->value + " already exists"); 
-//             if(node->left == nullptr) {
-//                 variableTable[node->value] = variableCount;
-//                 initialised[node->value] = false;
-//                 variableCount++;    
-//                 break;
-//             }
-//             variableTable[node->value] = variableCount;
-//             compileNode(node->left.get());
-//             bytecode.push_back({OpCode::STORE, variableCount});
-//             initialised[node->value] = true;
-
-//             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-//             variableCount++;
-//             break;
-
-//         case NodeType::Print:
-//             compileNode(node->left.get());
-//             bytecode.push_back({OpCode::PRINT});
-//             break;
-
-//         case NodeType::Println:
-//             compileNode(node->left.get());
-//             bytecode.push_back({OpCode::PRINTLN});
-//             break;
-        
-//         case NodeType::If:
-//         {   
-//             compileNode(node->left.get());
-
-//             size_t jumpIndex = bytecode.size();
-//             bytecode.push_back({OpCode::JUMP_IF_FALSE, 0});
-//             compileNode(node->right.get());
-//             bytecode[jumpIndex].operand = bytecode.size();
-//             break;
-//         }
-
-//         case NodeType::While:
-//         {
-//             size_t loopStartIndex = bytecode.size();
-//             compileNode(node->left.get());
-//             size_t jumpIndexIfFalse = bytecode.size();
-//             bytecode.push_back({OpCode::JUMP_IF_FALSE,0});
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::JUMP, static_cast<int>(loopStartIndex)});
-//             bytecode[jumpIndexIfFalse].operand = bytecode.size();
-//             break;
-//         }
-
-//         case NodeType::Block:
-//         {
-//             for(const auto& stm : node->statements) {
-//                 compileNode(stm.get());
-//             }
-//             break;
-//         }
-
-//         case NodeType::Assignment:
-//             compileNode(node->left.get());
-//             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-//             bytecode.push_back({OpCode::STORE, variableTable[node->value]});
-//             initialised[node->value] = true;
-//             break;
-
-//         case NodeType::Number:
-//         {
-//             Value val;
-//             if(node->value.find('.') != std::string::npos) {
-//                 val = std::stof(node->value);
-//             } 
-//             else {
-//                 val = std::stoi(node->value);
-
-//             }
-//             constants.push_back(val);
-//             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
-//             break;
-//         }
-
-//         case NodeType::Variable:
-//             if(variableTable.find(node->value) == variableTable.end()) throw std::runtime_error("Undefined variable: " + node->value);
-//             if(!initialised[node->value]) throw std::runtime_error("Using uninitialised variable: " + node->value);
-//             bytecode.push_back({OpCode::LOAD, variableTable[node->value]});
-//             break;
-        
-//         case NodeType::String:
-//             constants.push_back(node->value);
-//             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
-//             break;
-            
-//         case NodeType::Bool:
-//         {
-//             bool val = (node->value == "true");  
-//             constants.push_back(val);
-//             bytecode.push_back({OpCode::CONSTANT, static_cast<int>(constants.size()) - 1});
-//             break;
-//         }
-//         case NodeType::Plus:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::ADD});
-//             break;
-
-//         case NodeType::Minus:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::SUB});
-//             break;
-
-//         case NodeType::Asterisk:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::MUL});
-//             break;
-
-//         case NodeType::Slash:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::DIV});
-//             break;
-        
-//         case NodeType::Greater:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::GREATER});
-//             break;
-
-//         case NodeType::Smaller:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::SMALLER});
-//             break;
-
-//         case NodeType::Comparison:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::EQUAL});
-//             break;
-        
-//         case NodeType::NComparison:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::N_EQUAL});
-//             break;
-
-//         case NodeType::Or:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::OR});
-//             break;
-        
-//         case NodeType::And:
-//             compileNode(node->left.get());
-//             compileNode(node->right.get());
-//             bytecode.push_back({OpCode::AND});
-//             break;
-        
-//         case NodeType::Not:
-//             compileNode(node->left.get());
-//             bytecode.push_back({OpCode::NOT});
-//             break;
-        
-//         case NodeType::UnaryMinus:
-//             compileNode(node->left.get());
-//             bytecode.push_back({OpCode::UMINUS});
-//             break;
-
-//         default:
-//             break;
-//     }
-// }
-
 void Compiler::compileProgram() {
+    std::unordered_map<std::string, VariableInfo> globalScope;
+    variableTable.emplace_back(globalScope);
     for(const auto& node : nodes_) {
         node->compile(*this);
     }
@@ -211,6 +38,11 @@ std::string Compiler::opcodeToString(OpCode op) {
     }
 }
 
+std::ostream& operator<<(std::ostream& o, const VariableInfo& v) {
+    o << v.operand;
+    return o;
+}
+
 void Compiler::dumpBytecode() const {
     std::cout << "\n==== BYTECODE ====\n";
 
@@ -237,23 +69,20 @@ void Compiler::dumpBytecode() const {
 
     std::cout << "\nVariables:\n";
 
-    for(const auto& [name, slot] : variableTable) {
+    for(const auto& [name, slot] : variableTable.back()) {
         std::cout << name << " -> slot " << slot << "\n";
     }
 
     std::cout << "\nVariable count: " << variableCount << "\n";
 }
 
-
-
-std::unordered_map<std::string, int> Compiler::getMap() const {
-    return variableTable;
-}
+// std::unordered_map<std::string, int> Compiler::getMap() const {
+//     return variableTable;
+// }
 
 std::vector<Instruction> Compiler::getByteCode() const {
     return bytecode;
 }
-
 
 std::vector<Value> Compiler::getConstants() const {
     return constants;
@@ -271,21 +100,33 @@ int Compiler::getVariableCount() const {
     return variableCount;
 }
 
+//
 int Compiler::getInstrOperand(const std::string& value) {
-    return variableTable[value];
+    return variableTable.back()[value].operand;
 }
 
-bool Compiler::resolveVariable(const std::string& variable) const {
-    if(variableTable.find(variable) != variableTable.end()) return true;
+std::optional<VariableScopeInfo> Compiler::resolveVariableAnyScope(const std::string& variable) {
+    for(size_t i = variableTable.size(); i > 0; i--) {
+        if(auto it = variableTable[i - 1].find(variable); it != variableTable[i - 1].end()) {
+            VariableScopeInfo varScopeInfo{i - 1, &it->second};
+            return varScopeInfo;
+        }
+    }
+    return std::nullopt;
+}
+
+bool Compiler::resolveVariableCurrentScope(const std::string& variable) const {
+    if(variableTable.back().find(variable) != variableTable.back().end()) return true;
     return false;
 }
 
+//
 bool Compiler::isInitialized(const std::string& value) {
-    return initialised[value];
+    return variableTable.back()[value].initialized;
 }
 
 void Compiler::defineVariable(const std::string& value) {
-    variableTable[value] = variableCount;
+    variableTable.back()[value].operand = variableCount;
     variableCount++;
 }
 
@@ -294,7 +135,11 @@ void Compiler::addConstant(const Value& constant) {
 }
 
 void Compiler::markInitialized(const std::string& value, bool init) {
-    initialised[value] = init;
+    variableTable.back()[value].initialized = init;
+}
+
+void Compiler::markScopeBasedInitialization(const std::string& value, size_t scopeIndex) {
+    variableTable[scopeIndex][value].initialized = true;
 }
 
 void Compiler::emit(Instruction instruction) {
@@ -303,6 +148,15 @@ void Compiler::emit(Instruction instruction) {
 
 void Compiler::setInstrOperand(int op, int val) {
     bytecode[op].operand = val;
+}
+
+void Compiler::enterScope() {
+    std::unordered_map<std::string, VariableInfo> map;
+    variableTable.emplace_back(map);
+}
+
+void Compiler::leaveScope() {
+    variableTable.pop_back();
 }
 
 

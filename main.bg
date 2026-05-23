@@ -1,25 +1,32 @@
-let a = 50.0;
-let b = 100.0;
-let operation = "+";
+let x = 1;
+println(x);
 
+if(true) {
+    println(x);
 
-if(operation == "+") {
-    println(a + b);
-}
+    let y = 2;
+    println(y);
 
-if(operation == "-") {
-    println(a - b);
-}
+    x = 5;
+    println(x);
 
-if(operation == "*") {
-    println(a * b);
-}
+    let x = 100;
+    println(x);
 
-if(operation == "/") {
-    if(b != 0) {
-        println(a / b);
+    if(true) {
+        println(x);
+        y = 20;
+        println(y);
+
+        let z = 300;
+        println(z);
+
+        let x = 1000;
+        println(x);
     }
-    if(b == 0) {
-        println("Cannot divide by 0");
-    }
+
+    println(x);
+    println(y);
 }
+
+println(x);

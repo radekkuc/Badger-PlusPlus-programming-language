@@ -3,6 +3,7 @@
 #include <variant>
 #include <unordered_map>
 #include <memory>
+#include <optional>
 
 // Operation code
 enum class OpCode : uint8_t {
@@ -19,15 +20,26 @@ struct Instruction {
     int operand = 0;
 };
 
+struct VariableInfo {
+    int operand;
+    bool initialized;
+};
+
+struct VariableScopeInfo {
+    size_t index;
+    VariableInfo* varInfo;
+};
+
+std::ostream& operator<<(std::ostream& o, const VariableInfo& v);
+
 using Value = std::variant<int, std::string, float, bool>;
 
 class Compiler {
 private:
     const std::vector<std::unique_ptr<ASTNode>>& nodes_;
+    std::vector<std::unordered_map<std::string, VariableInfo>> variableTable;
     std::vector<Instruction> bytecode;
-    std::unordered_map<std::string, int> variableTable;
     std::vector<Value> constants;
-    std::unordered_map<std::string, bool> initialised;
     int variableCount;
 public:
     explicit Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes);
@@ -45,12 +57,16 @@ public:
     int getVariableCount() const;
     int getInstrOperand(const std::string& value);
 
-    bool resolveVariable(const std::string& variable) const;
+    std::optional<VariableScopeInfo> resolveVariableAnyScope(const std::string& variable);
+    bool resolveVariableCurrentScope(const std::string& variable) const;
     bool isInitialized(const std::string& value);
 
     void defineVariable(const std::string& value);
     void addConstant(const Value& constant);
     void markInitialized(const std::string& value, bool init = true);
+    void markScopeBasedInitialization(const std::string& value, size_t scopeIndex);
     void emit(Instruction instruction);
     void setInstrOperand(int op, int val);
+    void enterScope();
+    void leaveScope();
 };
