@@ -100,15 +100,19 @@ int Compiler::getVariableCount() const {
     return variableCount;
 }
 
+//
 int Compiler::getInstrOperand(const std::string& value) {
     return variableTable.back()[value].operand;
 }
 
-bool Compiler::resolveVariableAnyScope(const std::string& variable) const {
+std::optional<VariableScopeInfo> Compiler::resolveVariableAnyScope(const std::string& variable) {
     for(size_t i = variableTable.size(); i > 0; i--) {
-        if(variableTable[i - 1].find(variable) != variableTable[i - 1].end()) return true;
+        if(auto it = variableTable[i - 1].find(variable); it != variableTable[i - 1].end()) {
+            VariableScopeInfo varScopeInfo{i - 1, &it->second};
+            return varScopeInfo;
+        }
     }
-    return false;
+    return std::nullopt;
 }
 
 bool Compiler::resolveVariableCurrentScope(const std::string& variable) const {
@@ -116,6 +120,7 @@ bool Compiler::resolveVariableCurrentScope(const std::string& variable) const {
     return false;
 }
 
+//
 bool Compiler::isInitialized(const std::string& value) {
     return variableTable.back()[value].initialized;
 }
@@ -131,6 +136,10 @@ void Compiler::addConstant(const Value& constant) {
 
 void Compiler::markInitialized(const std::string& value, bool init) {
     variableTable.back()[value].initialized = init;
+}
+
+void Compiler::markScopeBasedInitialization(const std::string& value, size_t scopeIndex) {
+    variableTable[scopeIndex][value].initialized = true;
 }
 
 void Compiler::emit(Instruction instruction) {

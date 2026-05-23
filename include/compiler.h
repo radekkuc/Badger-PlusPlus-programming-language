@@ -3,6 +3,7 @@
 #include <variant>
 #include <unordered_map>
 #include <memory>
+#include <optional>
 
 // Operation code
 enum class OpCode : uint8_t {
@@ -22,6 +23,11 @@ struct Instruction {
 struct VariableInfo {
     int operand;
     bool initialized;
+};
+
+struct VariableScopeInfo {
+    size_t index;
+    VariableInfo* varInfo;
 };
 
 std::ostream& operator<<(std::ostream& o, const VariableInfo& v);
@@ -51,13 +57,14 @@ public:
     int getVariableCount() const;
     int getInstrOperand(const std::string& value);
 
-    bool resolveVariableAnyScope(const std::string& variable) const;
+    std::optional<VariableScopeInfo> resolveVariableAnyScope(const std::string& variable);
     bool resolveVariableCurrentScope(const std::string& variable) const;
     bool isInitialized(const std::string& value);
 
     void defineVariable(const std::string& value);
     void addConstant(const Value& constant);
     void markInitialized(const std::string& value, bool init = true);
+    void markScopeBasedInitialization(const std::string& value, size_t scopeIndex);
     void emit(Instruction instruction);
     void setInstrOperand(int op, int val);
     void enterScope();

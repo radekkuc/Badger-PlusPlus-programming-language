@@ -113,8 +113,6 @@ void VarDeclNode::compile(Compiler& compiler) const {
             expression->compile(compiler);
             compiler.emit({OpCode::STORE, operand});
             compiler.markInitialized(value);
-
-            if(!compiler.resolveVariableAnyScope(value)) throw std::runtime_error("Undefined variable: " + value);
             break;
         }
         default:
@@ -126,12 +124,14 @@ VarDeclNode::VarDeclNode(NodeType nodeType, const std::string& value, std::uniqu
 
 void AssignmentNode::compile(Compiler& compiler) const {
     switch(nodeType) {
-        case NodeType::Assignment:
+        case NodeType::Assignment:{
+            std::optional<VariableScopeInfo> varScopeInfo = compiler.resolveVariableAnyScope(value);
             expression->compile(compiler);
-            if(!compiler.resolveVariableAnyScope(value)) throw std::runtime_error("Undefined variable: " + value);
-            compiler.emit({OpCode::STORE, compiler.getInstrOperand(value)});
-            compiler.markInitialized(value);
+            if(!varScopeInfo) throw std::runtime_error("Undefined variable: " + value);
+            compiler.emit({OpCode::STORE, varScopeInfo->varInfo->operand});
+            compiler.markScopeBasedInitialization(value, varScopeInfo->index);
             break;
+        }
         
         default:
             break;
@@ -256,10 +256,14 @@ ValueNode::ValueNode(NodeType nodeType, const std::string& value) : ASTNode(node
 void VariableNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::Variable:
-            if(!compiler.resolveVariableAnyScope(value)) throw std::runtime_error("Undefined variable: " + value);
-            if(!compiler.isInitialized(value)) throw std::runtime_error("Using uninitialised variable: " + value);
-            compiler.emit({OpCode::LOAD, compiler.getInstrOperand(value)});
+        {
+            std::optional<VariableScopeInfo> varScopeInfo = compiler.resolveVariableAnyScope(value);
+            if(!varScopeInfo) throw std::runtime_error("Undefined variable: " + value);
+            if(!varScopeInfo->varInfo->initialized) throw std::runtime_error("Using uninitialised variable: " + value);
+            compiler.emit({OpCode::LOAD, varScopeInfo->varInfo->operand});
             break;
+        }
+
     }
 }
 

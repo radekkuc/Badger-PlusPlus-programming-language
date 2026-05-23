@@ -1,13 +1,32 @@
-let x = 10;
-print("Value of x in global scope is: ");
+let x = 1;
 println(x);
 
-if(x == 10) {
-    let x;
-    print("Value of x in inner scope is: ");
+if(true) {
     println(x);
+
+    let y = 2;
+    println(y);
+
+    x = 5;
+    println(x);
+
+    let x = 100;
+    println(x);
+
+    if(true) {
+        println(x);
+        y = 20;
+        println(y);
+
+        let z = 300;
+        println(z);
+
+        let x = 1000;
+        println(x);
+    }
+
+    println(x);
+    println(y);
 }
 
-print("Value of x out of inner scope is: ");
 println(x);
-
