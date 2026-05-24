@@ -100,7 +100,6 @@ int Compiler::getVariableCount() const {
     return variableCount;
 }
 
-//
 int Compiler::getInstrOperand(const std::string& value) {
     return variableTable.back()[value].operand;
 }
@@ -120,7 +119,6 @@ bool Compiler::resolveVariableCurrentScope(const std::string& variable) const {
     return false;
 }
 
-//
 bool Compiler::isInitialized(const std::string& value) {
     return variableTable.back()[value].initialized;
 }

@@ -195,7 +195,7 @@ void IfNode::compile(Compiler& compiler) const {
     }
 }
 
-IfNode::IfNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), conditionNode(std::move(conditionNode)), blockNode(std::move(blockNode)) {};
+IfNode::IfNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode, std::unique_ptr<ASTNode> elseBranch) : ASTNode(nodeType, value), conditionNode(std::move(conditionNode)), blockNode(std::move(blockNode)), elseBranch(std::move(elseBranch)) {};
 
 void WhileNode::compile(Compiler& compiler) const {
     switch(nodeType) {

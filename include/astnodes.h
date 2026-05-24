@@ -81,9 +81,10 @@ class IfNode : public ASTNode {
 private:
     std::unique_ptr<ASTNode> conditionNode;
     std::unique_ptr<ASTNode> blockNode;
+    std::unique_ptr<ASTNode> elseBranch;
 public:
     void compile(Compiler& compiler) const override;
-    IfNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode);
+    IfNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode, std::unique_ptr<ASTNode> elseBranch = nullptr);
 };
 
 class WhileNode : public ASTNode {

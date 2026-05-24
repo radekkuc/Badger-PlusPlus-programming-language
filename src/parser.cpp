@@ -10,8 +10,10 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
     std::vector<std::unique_ptr<ASTNode>> nodes{};
     while(peek().type != TokenType::ENDOFFILE) {
         statementNode = parseStatement();
-        if(needSemicolon(statementNode->getNodeType())) expect(TokenType::SEMICOLON, "Missing ; at the end");
-        advance();
+        if(needSemicolon(statementNode->getNodeType())) {
+            expect(TokenType::SEMICOLON, "Missing ; at the end");
+            advance();
+        } 
         nodes.emplace_back(std::move(statementNode));
     }
     return nodes;
@@ -22,7 +24,6 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     if(match(TokenType::PRINT) || match(TokenType::PRINTLN)) return parsePrintStatement();  
     if(match(TokenType::VARIABLE)) return parseAssignment();
     if(match(TokenType::IF)) return parseIfStatement();
-    if(match(TokenType::ELSE)) return parseElseStatement();
     if(match(TokenType::WHILE)) return parseWhileStatement();
     throw std::runtime_error("Unexpected statement: " + peek().value);
 }
@@ -193,12 +194,20 @@ std::unique_ptr<ASTNode> Parser::parseIfStatement() {
         advance();
         std::unique_ptr<ASTNode> conditionNode = parseExpression();
         std::unique_ptr<ASTNode> blockNode;
+        std::unique_ptr<ASTNode> elseBranch = nullptr;
         if(match(TokenType::RPAREN)) {
             advance();
             if(match(TokenType::LCURLY)) blockNode = parseBlock();        
             else throw std::runtime_error("Missing opening curly brace in if statement");
         } 
-        return std::make_unique<IfNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode));
+        else throw std::runtime_error("Missing closing parenthesis in if statement");
+        if(match(TokenType::ELSE)) {
+            advance();
+            if(match(TokenType::IF)) elseBranch = parseIfStatement();
+            else if(match(TokenType::LCURLY)) elseBranch = parseBlock();
+            else throw std::runtime_error("Expected opening curly brace or if statement but got: " + peek().value);
+        }
+        return std::make_unique<IfNode>(NodeType::If, "If", std::move(conditionNode), std::move(blockNode), std::move(elseBranch));
     }
     throw std::runtime_error("Missing opening paren in if statement");
 }
@@ -224,16 +233,15 @@ std::unique_ptr<ASTNode> Parser::parseBlock() {
     advance();
     while(!match(TokenType::RCURLY)) {
         std::unique_ptr<ASTNode> bodyNode = parseStatement();
-        if(needSemicolon(bodyNode->getNodeType())) expect(TokenType::SEMICOLON, "Missing semicolon in if statement");
-        advance();
+        if(needSemicolon(bodyNode->getNodeType())) {
+            expect(TokenType::SEMICOLON, "Missing semicolon in if statement");
+            advance();
+        }             
         statementNodes.emplace_back(std::move(bodyNode));
         }
     expect(TokenType::RCURLY, "Missing closing curly brace in statement");
+    advance();
     return std::make_unique<BlockNode>(NodeType::Block, "Block", std::move(statementNodes));
-}
-
-std::unique_ptr<ASTNode> Parser::parseElseStatement() {
-    return nullptr;
 }
 
 Token Parser::peek() {
