@@ -1,11 +1,13 @@
-let x = 1;
+let x = 5;
 
-if(x == 1) {
-    println("x equals 2");
+if(x == 5) {
+    println("a");
+}
+else if(x > 0) {
+    println("b");
+}
+else {
+    println("c");
 }
 
-while(x < 10) {
-    x = x + 1;
-    print("Value of x is:  ");
-    println(x);
-}
+println("done");

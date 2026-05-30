@@ -1,6 +1,7 @@
 #include "astnodes.h"
 #include "parser.h"
 #include "compiler.h"
+#include "utils.h"
 #include <stdexcept>
 
 ASTNode::ASTNode(NodeType nodeType, std::string value) : nodeType(nodeType), value(value) {};
@@ -187,7 +188,15 @@ void IfNode::compile(Compiler& compiler) const {
             size_t jumpIndex = compiler.getByteCodeSize();
             compiler.emit({OpCode::JUMP_IF_FALSE, 0});
             blockNode->compile(compiler);
+
+            size_t jumpIndexEnd = compiler.getByteCodeSize();
+            compiler.emit({OpCode::JUMP, 0});
             compiler.setInstrOperand(jumpIndex, compiler.getByteCodeSize());
+
+            if(elseBranch != nullptr) {
+                elseBranch.get()->compile(compiler);
+            }
+            compiler.setInstrOperand(jumpIndexEnd, compiler.getByteCodeSize());
             break;
         }
         default:

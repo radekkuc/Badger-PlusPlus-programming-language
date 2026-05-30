@@ -41,9 +41,9 @@ int main(int argc, char** argv){
         // // //     std::cout << pair.first << "," << pair.second << std::endl; 
         // // // }
         
-        // std::vector<Instruction> byteCode = compiler.getByteCode();
-        // std::vector<Value> constants = compiler.getConstants();
-        // int varCount = compiler.getVariableCount();
+        std::vector<Instruction> byteCode = compiler.getByteCode();
+        std::vector<Value> constants = compiler.getConstants();
+        int varCount = compiler.getVariableCount();
 
         // // for (const auto& constant : constants) {
         // //     std::visit([](const auto& v) {
@@ -52,8 +52,8 @@ int main(int argc, char** argv){
         // //     }, constant);
         // // }
 
-        // Interpreter interpreter(byteCode, constants, varCount);
-        // interpreter.run();
+        Interpreter interpreter(byteCode, constants, varCount);
+        interpreter.run();
     }
     catch(const std::exception& e) {
         std::cerr << "Exception has occurred: " << e.what() << std::endl; 
