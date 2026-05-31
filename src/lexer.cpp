@@ -101,6 +101,10 @@ std::vector<Token> Lexer::identify() {
                 tokens.push_back(Token{TokenType::SEMICOLON, ";"});
                 currIndex_++;
                 break;
+            case ',':
+                tokens.push_back(Token{TokenType::COMMA, ","});
+                currIndex_++;
+                break;
 
             default:
                 if(isspace(c)) skipWhiteSpace();
@@ -160,6 +164,8 @@ Token Lexer::readWord() {
     if(variable == "if") return Token{TokenType::IF, variable};
     if(variable == "else") return Token{TokenType::ELSE, variable};
     if(variable == "while") return Token{TokenType::WHILE, variable};
+    if(variable == "fun") return Token{TokenType::FUN, variable};
+    if(variable == "return") return Token{TokenType::RETURN, variable};
     if(variable == "print") return Token{TokenType::PRINT, variable};
     if(variable == "println") return Token{TokenType::PRINTLN, variable};
     if(variable == "true" || variable == "false") return Token{TokenType::BOOL, variable};
