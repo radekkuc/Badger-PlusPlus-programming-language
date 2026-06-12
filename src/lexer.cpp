@@ -156,7 +156,7 @@ Token Lexer::readNumber() {
 
 Token Lexer::readWord() {
     std::string variable;
-    while(isalpha(peek()) && currIndex_ < line_.size()) {
+    while(isalnum(peek()) && currIndex_ < line_.size()) {
         variable += peek();
         currIndex_++;
     }

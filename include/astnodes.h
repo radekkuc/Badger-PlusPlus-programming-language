@@ -96,6 +96,14 @@ public:
     WhileNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode);
 };
 
+class FunDeclNode : public ASTNode {
+
+};
+
+class FunCallNode : public ASTNode {
+
+};
+
 // CONSTANT
 class ValueNode : public ASTNode {
 private:
