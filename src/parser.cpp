@@ -25,6 +25,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     if(match(TokenType::VARIABLE)) return parseAssignment();
     if(match(TokenType::IF)) return parseIfStatement();
     if(match(TokenType::WHILE)) return parseWhileStatement();
+    if(match(TokenType::FUN)) return parseFunDecl();
     throw std::runtime_error("Unexpected statement: " + peek().value);
 }
 
@@ -228,6 +229,22 @@ std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
     throw std::runtime_error("Missing opening paren in while loop");
 }
 
+std::unique_ptr<ASTNode> Parser::parseFunDecl() {
+    if(match(TokenType::VARIABLE)) {
+        std::unique_ptr<ASTNode> funName = std::make_unique<VariableNode>(NodeType::Variable, peek().value);
+        advance();
+        if(match(TokenType::LPAREN)) {
+            advance();
+            while(!match(TokenType::RPAREN)) {
+                if(match(TokenType::VARIABLE)) {
+                    
+                }
+            }
+        }
+    }    
+    throw std::runtime_error("Expected name of function declaration but got: " + tokens_[currIndex_].value);
+}
+
 std::unique_ptr<ASTNode> Parser::parseBlock() {
     std::vector<std::unique_ptr<ASTNode>> statementNodes;
     advance();
@@ -260,7 +277,8 @@ bool Parser::match(TokenType type) {
 bool Parser::needSemicolon(NodeType type) {
     if(type == NodeType::If ||
         type == NodeType::Else ||
-        type == NodeType::While) {
+        type == NodeType::While ||
+        type == NodeType::FunDecl) {
         return false;
        } 
     return true;
