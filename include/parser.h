@@ -32,6 +32,7 @@ public:
     std::unique_ptr<ASTNode> parseUnary();
 
     Token peek();
+    Token peekNext();
     bool match(TokenType type);
     bool needSemicolon(NodeType type);
     const char* tokenType(TokenType type);

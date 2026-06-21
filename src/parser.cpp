@@ -229,20 +229,36 @@ std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
     throw std::runtime_error("Missing opening paren in while loop");
 }
 
+// fun add(x, y, z)
+// if there is a variable, next is comma then we expect another variable
+// if there is a variable, next is not comma then we expect rparen
+
 std::unique_ptr<ASTNode> Parser::parseFunDecl() {
     if(match(TokenType::VARIABLE)) {
-        std::unique_ptr<ASTNode> funName = std::make_unique<VariableNode>(NodeType::Variable, peek().value);
+        std::string funName = peek().value;
+        std::vector<std::unique_ptr<ASTNode>> parameters;
+        std::unique_ptr<ASTNode> blockNode;
         advance();
         if(match(TokenType::LPAREN)) {
             advance();
             while(!match(TokenType::RPAREN)) {
                 if(match(TokenType::VARIABLE)) {
-                    
+                    parameters.emplace_back(std::make_unique<VariableNode>(NodeType::Variable, peek().value));
+                    if(peekNext().type == TokenType::COMMA) {
+                        advance();
+                        continue;
+                    }
+                    else if(peekNext().type == TokenType::RPAREN) {
+                        advance();
+                        break;
+                    }
                 }
             }
+            expect(TokenType::RPAREN, "Expected closing paren");
         }
+        if(match(TokenType::LCURLY)) blockNode = parseBlock();       
     }    
-    throw std::runtime_error("Expected name of function declaration but got: " + tokens_[currIndex_].value);
+    throw std::runtime_error("Expected name of function declaration but got: " + peek().value);
 }
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
@@ -263,6 +279,13 @@ std::unique_ptr<ASTNode> Parser::parseBlock() {
 
 Token Parser::peek() {
     return tokens_[currIndex_];
+}
+
+Token Parser::peekNext() {
+    if(currIndex_ + 1 < tokens_.size()) {
+        return tokens_[currIndex_ + 1];
+    }
+    return Token{TokenType::ENDOFFILE, "EOF"};
 }
 
 bool Parser::match(TokenType type) {
