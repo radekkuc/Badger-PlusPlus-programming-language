@@ -26,6 +26,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     if(match(TokenType::IF)) return parseIfStatement();
     if(match(TokenType::WHILE)) return parseWhileStatement();
     if(match(TokenType::FUN)) return parseFunDecl();
+    if(match(TokenType::RETURN)) return parseReturnStatement();
     throw std::runtime_error("Unexpected statement: " + peek().value);
 }
 
@@ -234,29 +235,31 @@ std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
 // if there is a variable, next is not comma then we expect rparen
 
 std::unique_ptr<ASTNode> Parser::parseFunDecl() {
+    advance();
     if(match(TokenType::VARIABLE)) {
         std::string funName = peek().value;
-        std::vector<std::unique_ptr<ASTNode>> parameters;
+        std::vector<std::string> parameters;
         std::unique_ptr<ASTNode> blockNode;
         advance();
         if(match(TokenType::LPAREN)) {
             advance();
-            while(!match(TokenType::RPAREN)) {
-                if(match(TokenType::VARIABLE)) {
-                    parameters.emplace_back(std::make_unique<VariableNode>(NodeType::Variable, peek().value));
-                    if(peekNext().type == TokenType::COMMA) {
-                        advance();
-                        continue;
-                    }
-                    else if(peekNext().type == TokenType::RPAREN) {
-                        advance();
-                        break;
-                    }
+            if(match(TokenType::VARIABLE)) {
+                parameters.emplace_back(peek().value);
+                advance();
+                while(match(TokenType::COMMA)) {
+                    advance();
+                    expect(TokenType::VARIABLE, "Expected function parameter after comma");
+                    parameters.emplace_back(peek().value);
+                    advance();
                 }
             }
             expect(TokenType::RPAREN, "Expected closing paren");
+            advance();
         }
-        if(match(TokenType::LCURLY)) blockNode = parseBlock();       
+        else throw std::runtime_error("Missing opening paren in function declaration");
+        expect(TokenType::LCURLY, "Missing opening curly brace for function declaration");
+        blockNode = parseBlock();  
+        return std::make_unique<FunDeclNode>(NodeType::FunDecl, "FunDecl", funName, std::move(parameters), std::move(blockNode));
     }    
     throw std::runtime_error("Expected name of function declaration but got: " + peek().value);
 }
@@ -276,6 +279,11 @@ std::unique_ptr<ASTNode> Parser::parseBlock() {
     advance();
     return std::make_unique<BlockNode>(NodeType::Block, "Block", std::move(statementNodes));
 }
+
+std::unique_ptr<ASTNode> Parser::parseReturnStatement() {
+
+}
+
 
 Token Parser::peek() {
     return tokens_[currIndex_];

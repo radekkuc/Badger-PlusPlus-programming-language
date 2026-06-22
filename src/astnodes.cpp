@@ -260,6 +260,12 @@ void ValueNode::compile(Compiler& compiler) const {
     }
 }
 
+void FunDeclNode::compile(Compiler& compiler) const {
+
+}
+
+FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
+
 ValueNode::ValueNode(NodeType nodeType, const std::string& value) : ASTNode(nodeType, value) {};
 
 void VariableNode::compile(Compiler& compiler) const {

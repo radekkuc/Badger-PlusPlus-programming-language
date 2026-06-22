@@ -98,19 +98,21 @@ public:
 
 class FunDeclNode : public ASTNode {
 private:
-    std::vector<ASTNode> parameters;
+    std::string funName;
+    std::vector<std::string> parameters;
     std::unique_ptr<ASTNode> blockNode;
-    std::unique_ptr<ASTNode> retValue;
 public:
     void compile(Compiler& compiler) const override;
-    FunDeclNode(NodeType nodeType, const std::string& value, std::vector<ASTNode> parameters, std::unique_ptr<ASTNode> blockNode, std::unique_ptr<ASTNode> retValue = nullptr);
+    FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode);
 };
 
 class FunCallNode : public ASTNode {
 
 };
 
-// RETURN NODE?
+class ReturnNode : public ASTNode {
+
+};
 
 // CONSTANT
 class ValueNode : public ASTNode {
