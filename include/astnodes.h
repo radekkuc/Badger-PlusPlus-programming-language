@@ -6,7 +6,7 @@
 
 enum class NodeType : uint8_t {
     VarDecl, Print, Println, Assignment,
-    If, Else, While, Block, FunDecl,
+    If, Else, While, Block, FunDecl, Return,
     Greater, Smaller, Or, And, Not, Comparison, NComparison,
     Plus, Minus, Asterisk, Slash, Equal, Lparen, Rparen,
     UnaryMinus, Number, Variable, Bool, String
@@ -111,7 +111,11 @@ class FunCallNode : public ASTNode {
 };
 
 class ReturnNode : public ASTNode {
-
+private:
+    std::unique_ptr<ASTNode> retVal;
+public:
+    void compile(Compiler& compiler) const override;
+    ReturnNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> retVal);
 };
 
 // CONSTANT

@@ -281,9 +281,10 @@ std::unique_ptr<ASTNode> Parser::parseBlock() {
 }
 
 std::unique_ptr<ASTNode> Parser::parseReturnStatement() {
-
+    advance();
+    std::unique_ptr<ASTNode> retVal = parseExpression();
+    return std::make_unique<ReturnNode>(NodeType::Return, "Return", std::move(retVal));
 }
-
 
 Token Parser::peek() {
     return tokens_[currIndex_];

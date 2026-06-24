@@ -226,6 +226,19 @@ void WhileNode::compile(Compiler& compiler) const {
 
 WhileNode::WhileNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> conditionNode, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), conditionNode(std::move(conditionNode)), blockNode(std::move(blockNode)) {};
 
+
+void FunDeclNode::compile(Compiler& compiler) const {
+
+}
+
+FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
+
+void ReturnNode::compile(Compiler& compiler) const {
+
+}
+
+ReturnNode::ReturnNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> retVal) : ASTNode(nodeType, value), retVal(std::move(retVal)) {};
+
 void ValueNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::Number:
@@ -259,12 +272,6 @@ void ValueNode::compile(Compiler& compiler) const {
             break;
     }
 }
-
-void FunDeclNode::compile(Compiler& compiler) const {
-
-}
-
-FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
 
 ValueNode::ValueNode(NodeType nodeType, const std::string& value) : ASTNode(nodeType, value) {};
 
