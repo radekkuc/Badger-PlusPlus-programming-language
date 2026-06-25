@@ -237,6 +237,13 @@ void ReturnNode::compile(Compiler& compiler) const {
 
 }
 
+void FunCallNode::compile(Compiler& compiler) const {
+
+}
+
+FunCallNode::FunCallNode(NodeType nodeType, std::string value, std::string funName, std::vector<std::unique_ptr<ASTNode>> arguments) : ASTNode(nodeType, value), funName(funName), arguments(std::move(arguments)) {};
+
+
 ReturnNode::ReturnNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> retVal) : ASTNode(nodeType, value), retVal(std::move(retVal)) {};
 
 void ValueNode::compile(Compiler& compiler) const {

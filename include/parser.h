@@ -24,6 +24,7 @@ public:
     std::unique_ptr<ASTNode> parseWhileStatement();
     std::unique_ptr<ASTNode> parseReturnStatement();
     std::unique_ptr<ASTNode> parseFunDecl();
+    std::unique_ptr<ASTNode> parseFunCall();
     std::unique_ptr<ASTNode> parseBlock();
 
     std::unique_ptr<ASTNode> parseOr();
@@ -35,6 +36,7 @@ public:
     Token peek();
     Token peekNext();
     bool match(TokenType type);
+    bool matchNext(TokenType type);
     bool needSemicolon(NodeType type);
     const char* tokenType(TokenType type);
     const char* nodeType(NodeType type);

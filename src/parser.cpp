@@ -22,7 +22,8 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parseProgram() {
 std::unique_ptr<ASTNode> Parser::parseStatement() {
     if(match(TokenType::LET)) return parseLetStatement();
     if(match(TokenType::PRINT) || match(TokenType::PRINTLN)) return parsePrintStatement();  
-    if(match(TokenType::VARIABLE)) return parseAssignment();
+    if(match(TokenType::VARIABLE) && matchNext(TokenType::EQUALS)) return parseAssignment();
+    if(match(TokenType::VARIABLE) && matchNext(TokenType::LPAREN)) return parseFunCall();
     if(match(TokenType::IF)) return parseIfStatement();
     if(match(TokenType::WHILE)) return parseWhileStatement();
     if(match(TokenType::FUN)) return parseFunDecl();
@@ -125,6 +126,11 @@ std::unique_ptr<ASTNode> Parser::parseFactor() {
         std::unique_ptr<ASTNode> node = parseExpression();
         expect(TokenType::RPAREN, "Missing closing paren");
         advance();
+        return node;
+    }
+
+    if(match(TokenType::VARIABLE) && matchNext(TokenType::LPAREN)) {
+        std::unique_ptr<ASTNode> node = parseFunCall();
         return node;
     }
 
@@ -244,12 +250,12 @@ std::unique_ptr<ASTNode> Parser::parseFunDecl() {
         if(match(TokenType::LPAREN)) {
             advance();
             if(match(TokenType::VARIABLE)) {
-                parameters.emplace_back(peek().value);
+                parameters.push_back(peek().value);
                 advance();
                 while(match(TokenType::COMMA)) {
                     advance();
                     expect(TokenType::VARIABLE, "Expected function parameter after comma");
-                    parameters.emplace_back(peek().value);
+                    parameters.push_back(peek().value);
                     advance();
                 }
             }
@@ -262,6 +268,26 @@ std::unique_ptr<ASTNode> Parser::parseFunDecl() {
         return std::make_unique<FunDeclNode>(NodeType::FunDecl, "FunDecl", funName, std::move(parameters), std::move(blockNode));
     }    
     throw std::runtime_error("Expected name of function declaration but got: " + peek().value);
+}
+
+std::unique_ptr<ASTNode> Parser::parseFunCall() {
+    std::string funName = peek().value;
+    std::vector<std::unique_ptr<ASTNode>> arguments;
+    advance();
+    if(match(TokenType::LPAREN)) {
+        advance();
+        if(!match(TokenType::RPAREN)) {
+            arguments.push_back(parseExpression());
+            while(match(TokenType::COMMA)) {
+                advance();
+                arguments.push_back(parseExpression());
+            }
+        }
+        expect(TokenType::RPAREN, "Expected closing paren");
+        advance();
+    }
+    else throw std::runtime_error("Missing opening paren in function call");
+    return std::make_unique<FunCallNode>(NodeType::FunCall, "FunCall", funName, std::move(arguments));
 }
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
@@ -304,6 +330,15 @@ bool Parser::match(TokenType type) {
     } 
     if(peek().type == type) return true;
     return false;
+}
+
+bool Parser::matchNext(TokenType type) {
+    if(currIndex_ + 1 >= tokens_.size()) {
+        std::cerr << "Cannot check next token as it is out of bounds\n";
+        return false;
+    }
+    if(peekNext().type == type) return true;
+    return false;     
 }
 
 bool Parser::needSemicolon(NodeType type) {
