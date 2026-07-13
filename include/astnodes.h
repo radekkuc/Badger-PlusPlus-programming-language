@@ -74,6 +74,7 @@ private:
     std::vector<std::unique_ptr<ASTNode>> statementNodes;
 public:
     void compile(Compiler& compiler) const override;  
+    void compileFunBody(Compiler& compiler, const std::vector<std::string> parameters) const;
     BlockNode(NodeType nodeType, const std::string& value, std::vector<std::unique_ptr<ASTNode>> statementNodes = {});
 };
 

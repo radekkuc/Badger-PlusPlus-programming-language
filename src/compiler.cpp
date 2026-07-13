@@ -132,6 +132,10 @@ void Compiler::addConstant(const Value& constant) {
     constants.push_back(constant);
 }
 
+void Compiler::addFunction(const FunctionInfo& fun) {
+    functionTable.push_back(fun);
+}
+
 void Compiler::markInitialized(const std::string& value, bool init) {
     variableTable.back()[value].initialized = init;
 }

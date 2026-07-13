@@ -30,6 +30,12 @@ struct VariableScopeInfo {
     VariableInfo* varInfo;
 };
 
+struct FunctionInfo {
+    std::string name;
+    size_t startIndex;
+    int paramCount;
+};
+
 std::ostream& operator<<(std::ostream& o, const VariableInfo& v);
 
 using Value = std::variant<int, std::string, float, bool>;
@@ -40,6 +46,7 @@ private:
     std::vector<std::unordered_map<std::string, VariableInfo>> variableTable;
     std::vector<Instruction> bytecode;
     std::vector<Value> constants;
+    std::vector<FunctionInfo> functionTable;
     int variableCount;
 public:
     explicit Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes);
@@ -63,6 +70,7 @@ public:
 
     void defineVariable(const std::string& value);
     void addConstant(const Value& constant);
+    void addFunction(const FunctionInfo& fun);
     void markInitialized(const std::string& value, bool init = true);
     void markScopeBasedInitialization(const std::string& value, size_t scopeIndex);
     void emit(Instruction instruction);

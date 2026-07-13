@@ -228,7 +228,22 @@ WhileNode::WhileNode(NodeType nodeType, const std::string& value, std::unique_pt
 
 
 void FunDeclNode::compile(Compiler& compiler) const {
-
+    switch(nodeType) {
+        case NodeType::FunDecl:
+        {   
+            // compile block there instead in block node compile because parameters must be injected into scope so open scope here and inject them
+            // and just iterate through blocknode's statements 
+            size_t jumpIndex = compiler.getByteCodeSize();
+            compiler.emit({OpCode::JUMP, 0});
+            size_t startIndex = compiler.getByteCodeSize();
+            blockNode->compileFunBody(compiler, parameters);
+            compiler.setInstrOperand(jumpIndex, compiler.getByteCodeSize());
+            compiler.addFunction({funName, startIndex, static_cast<int>(parameters.size())});
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
