@@ -245,7 +245,7 @@ std::unique_ptr<ASTNode> Parser::parseFunDecl() {
     if(match(TokenType::VARIABLE)) {
         std::string funName = peek().value;
         std::vector<std::string> parameters;
-        std::unique_ptr<ASTNode> blockNode;
+        std::unique_ptr<BlockNode> blockNode;
         advance();
         if(match(TokenType::LPAREN)) {
             advance();
@@ -290,7 +290,7 @@ std::unique_ptr<ASTNode> Parser::parseFunCall() {
     return std::make_unique<FunCallNode>(NodeType::FunCall, "FunCall", funName, std::move(arguments));
 }
 
-std::unique_ptr<ASTNode> Parser::parseBlock() {
+std::unique_ptr<BlockNode> Parser::parseBlock() {
     std::vector<std::unique_ptr<ASTNode>> statementNodes;
     advance();
     while(!match(TokenType::RCURLY)) {

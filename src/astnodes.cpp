@@ -177,6 +177,27 @@ void BlockNode::compile(Compiler& compiler) const {
     }
 }
 
+void BlockNode::compileFunBody(Compiler& compiler, const std::vector<std::string>& parameters) const {
+        switch(nodeType) {
+        case NodeType::Block:
+        {
+            compiler.enterScope();
+            for(const auto& param : parameters) {
+                compiler.defineVariable(param);
+                compiler.markInitialized(param);    
+            }    
+            for(const auto& stm : statementNodes) {
+                stm->compile(compiler);
+            }
+            compiler.leaveScope();
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
 BlockNode::BlockNode(NodeType nodeType, const std::string& value, std::vector<std::unique_ptr<ASTNode>> statementNodes) : ASTNode(nodeType, value), statementNodes(std::move(statementNodes)) {};
 
 void IfNode::compile(Compiler& compiler) const {
@@ -231,14 +252,12 @@ void FunDeclNode::compile(Compiler& compiler) const {
     switch(nodeType) {
         case NodeType::FunDecl:
         {   
-            // compile block there instead in block node compile because parameters must be injected into scope so open scope here and inject them
-            // and just iterate through blocknode's statements 
             size_t jumpIndex = compiler.getByteCodeSize();
             compiler.emit({OpCode::JUMP, 0});
             size_t startIndex = compiler.getByteCodeSize();
+            compiler.addFunction({funName, startIndex, static_cast<int>(parameters.size())});
             blockNode->compileFunBody(compiler, parameters);
             compiler.setInstrOperand(jumpIndex, compiler.getByteCodeSize());
-            compiler.addFunction({funName, startIndex, static_cast<int>(parameters.size())});
             break;
         }
         default:
@@ -246,7 +265,8 @@ void FunDeclNode::compile(Compiler& compiler) const {
     }
 }
 
-FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
+
+FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<BlockNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
 
 void ReturnNode::compile(Compiler& compiler) const {
 

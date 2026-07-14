@@ -74,7 +74,7 @@ private:
     std::vector<std::unique_ptr<ASTNode>> statementNodes;
 public:
     void compile(Compiler& compiler) const override;  
-    void compileFunBody(Compiler& compiler, const std::vector<std::string> parameters) const;
+    void compileFunBody(Compiler& compiler, const std::vector<std::string>& parameters) const;
     BlockNode(NodeType nodeType, const std::string& value, std::vector<std::unique_ptr<ASTNode>> statementNodes = {});
 };
 
@@ -101,10 +101,10 @@ class FunDeclNode : public ASTNode {
 private:
     std::string funName;
     std::vector<std::string> parameters;
-    std::unique_ptr<ASTNode> blockNode;
+    std::unique_ptr<BlockNode> blockNode;
 public:
     void compile(Compiler& compiler) const override;
-    FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<ASTNode> blockNode);
+    FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<BlockNode> blockNode);
 };
 
 class FunCallNode : public ASTNode {
