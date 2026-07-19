@@ -1,6 +1,7 @@
 #include "compiler.h"
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 Compiler::Compiler(const std::vector<std::unique_ptr<ASTNode>>& nodes) : variableCount{}, nodes_(nodes) {};
 
@@ -104,6 +105,20 @@ int Compiler::getInstrOperand(const std::string& value) {
     return variableTable.back()[value].operand;
 }
 
+int Compiler::getFunIndex(const std::string& funName) const {
+    auto it = std::find_if(functionTable.begin(), functionTable.end(), [&funName](const FunctionInfo& funInfo) {
+        return funName == funInfo.name;
+    });
+
+    if(it == functionTable.end()) throw std::runtime_error("Function with given name does not exist");
+    return static_cast<int>(std::distance(functionTable.begin(), it));
+}
+
+int Compiler::getParamCountByIndex(int index) const {
+    return functionTable[index].paramCount;
+}
+
+
 std::optional<VariableScopeInfo> Compiler::resolveVariableAnyScope(const std::string& variable) {
     for(size_t i = variableTable.size(); i > 0; i--) {
         if(auto it = variableTable[i - 1].find(variable); it != variableTable[i - 1].end()) {
@@ -115,8 +130,7 @@ std::optional<VariableScopeInfo> Compiler::resolveVariableAnyScope(const std::st
 }
 
 bool Compiler::resolveVariableCurrentScope(const std::string& variable) const {
-    if(variableTable.back().find(variable) != variableTable.back().end()) return true;
-    return false;
+    return variableTable.back().find(variable) != variableTable.back().end();
 }
 
 bool Compiler::isInitialized(const std::string& value) {

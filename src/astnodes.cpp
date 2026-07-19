@@ -183,6 +183,7 @@ void BlockNode::compileFunBody(Compiler& compiler, const std::vector<std::string
         {
             compiler.enterScope();
             for(const auto& param : parameters) {
+                if(compiler.resolveVariableCurrentScope(param)) throw std::runtime_error("Duplicate parameter");
                 compiler.defineVariable(param);
                 compiler.markInitialized(param);    
             }    
@@ -268,16 +269,33 @@ void FunDeclNode::compile(Compiler& compiler) const {
 
 FunDeclNode::FunDeclNode(NodeType nodeType, const std::string& value, const std::string& funName, std::vector<std::string> parameters, std::unique_ptr<BlockNode> blockNode) : ASTNode(nodeType, value), funName(funName), parameters(std::move(parameters)), blockNode(std::move(blockNode)) {};
 
-void ReturnNode::compile(Compiler& compiler) const {
-
-}
-
 void FunCallNode::compile(Compiler& compiler) const {
-
+    switch(nodeType) {
+        case NodeType::FunCall: {
+            int funIndex = compiler.getFunIndex(funName);
+            if(compiler.getParamCountByIndex(funIndex) != arguments.size()) throw std::runtime_error("Wrong number of arguemtns provided");
+            for(const auto& arg : arguments) {
+                arg->compile(compiler);
+            }
+            compiler.emit({OpCode::CALL, funIndex});
+        }
+        default:
+            break;
+    }
 }
 
 FunCallNode::FunCallNode(NodeType nodeType, std::string value, std::string funName, std::vector<std::unique_ptr<ASTNode>> arguments) : ASTNode(nodeType, value), funName(funName), arguments(std::move(arguments)) {};
 
+void ReturnNode::compile(Compiler& compiler) const {
+    switch(nodeType) {
+        case NodeType::Return:
+            retVal->compile(compiler);
+            compiler.emit({OpCode::RETURN});
+            break;
+        default: 
+            break;
+    }
+}
 
 ReturnNode::ReturnNode(NodeType nodeType, const std::string& value, std::unique_ptr<ASTNode> retVal) : ASTNode(nodeType, value), retVal(std::move(retVal)) {};
 

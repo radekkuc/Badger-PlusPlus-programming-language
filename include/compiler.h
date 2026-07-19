@@ -12,7 +12,7 @@ enum class OpCode : uint8_t {
     GREATER, SMALLER, OR, AND, EQUAL, N_EQUAL,
     NOT, UMINUS,
     ADD, SUB, DIV, MUL,
-    JUMP_IF_FALSE, JUMP
+    JUMP_IF_FALSE, JUMP, RETURN, CALL
 };
 
 struct Instruction {
@@ -63,6 +63,8 @@ public:
     size_t getConstantsSize() const;
     int getVariableCount() const;
     int getInstrOperand(const std::string& value);
+    int getFunIndex(const std::string& funName) const;
+    int getParamCountByIndex(int index) const;
 
     std::optional<VariableScopeInfo> resolveVariableAnyScope(const std::string& variable);
     bool resolveVariableCurrentScope(const std::string& variable) const;
