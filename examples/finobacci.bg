@@ -1,0 +1,14 @@
+println("Fibonacci sequence");
+
+let previous = 0;
+let current = 1;
+let count = 0;
+
+while(count < 12) {
+    println(previous);
+
+    let next = previous + current;
+    previous = current;
+    current = next;
+    count = count + 1;
+}

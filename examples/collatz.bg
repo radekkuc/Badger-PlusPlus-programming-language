@@ -1,0 +1,25 @@
+println("Collatz sequence");
+
+let number = 27;
+let steps = 0;
+
+while(number != 1) {
+    println(number);
+
+    let half = number / 2;
+    let even = half * 2 == number;
+
+    if(even) {
+        number = half;
+    }
+    else {
+        number = number * 3 + 1;
+    }
+
+    steps = steps + 1;
+}
+
+println(number);
+
+print("Number of steps: ");
+println(steps);

@@ -1,0 +1,15 @@
+println("Factorial calculator");
+
+let number = 7;
+let factorial = 1;
+let current = 1;
+
+while(current < number + 1) {
+    factorial = factorial * current;
+    current = current + 1;
+}
+
+print("Factorial of ");
+print(number);
+print(" is ");
+println(factorial);

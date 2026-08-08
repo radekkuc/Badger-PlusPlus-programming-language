@@ -1,0 +1,16 @@
+println("Compound interest simulation");
+
+let balance = 1000.0;
+let rate = 1.05;
+let year = 1;
+
+while(year < 11) {
+    balance = balance * rate;
+
+    print("Year ");
+    print(year);
+    print(": ");
+    println(balance);
+
+    year = year + 1;
+}

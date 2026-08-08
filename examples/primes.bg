@@ -1,0 +1,24 @@
+println("Prime numbers below 30");
+
+let number = 2;
+
+while(number < 30) {
+    let divisor = 2;
+    let prime = true;
+
+    while(divisor < number && prime) {
+        let quotient = number / divisor;
+
+        if(quotient * divisor == number) {
+            prime = false;
+        }
+
+        divisor = divisor + 1;
+    }
+
+    if(prime) {
+        println(number);
+    }
+
+    number = number + 1;
+}

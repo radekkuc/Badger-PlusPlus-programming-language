@@ -1,0 +1,106 @@
+println("=== Badger++ demonstration ===");
+
+let greeting = "Hello, " + "Badger++!";
+println(greeting);
+
+let start = 2;
+let limit = 7;
+let total = 0;
+let current = start;
+
+println("Calculating squares");
+
+while(current < limit) {
+    let square = current * current;
+
+    print("Square of ");
+    print(current);
+    print(" is ");
+    println(square);
+
+    total = total + square;
+    current = current + 1;
+}
+
+print("Total: ");
+println(total);
+
+let count = limit - start;
+let average = total / count;
+let scaled = average * 1.5;
+let negative = -average;
+
+print("Average: ");
+println(average);
+
+print("Scaled average: ");
+println(scaled);
+
+print("Negative average: ");
+println(negative);
+
+let expectedTotal = total == 90;
+let safeRange = total > 50 && total < 100;
+let alert = !safeRange || false;
+
+print("Expected total: ");
+println(expectedTotal);
+
+print("Safe range: ");
+println(safeRange);
+
+print("Alert: ");
+println(alert);
+
+if(total > 100) {
+    println("The total is high");
+}
+else if(total == 90) {
+    println("The total is exactly correct");
+}
+else {
+    println("The total is lower than expected");
+}
+
+let message = "outer scope";
+
+println(message);
+
+if(expectedTotal) {
+    let message = "inner scope";
+    let adjustment = 10;
+
+    println(message);
+
+    total = total + adjustment;
+
+    if(adjustment == 10) {
+        let message = "deeply nested scope";
+        println(message);
+    }
+
+    println(message);
+}
+
+println(message);
+
+print("Adjusted total: ");
+println(total);
+
+let countdown = 3;
+
+while(countdown > 0) {
+    print("Countdown: ");
+    println(countdown);
+    countdown = countdown - 1;
+}
+
+let language = "Badger";
+let languageMatches = language == "Badger";
+let languageDiffers = language != "C++";
+
+if(languageMatches && languageDiffers) {
+    println("String comparisons work");
+}
+
+println("=== Demonstration finished ===");

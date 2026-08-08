@@ -1,0 +1,33 @@
+println("FizzBuzz");
+
+let number = 1;
+let nextThree = 3;
+let nextFive = 5;
+
+while(number < 31) {
+    let byThree = number == nextThree;
+    let byFive = number == nextFive;
+
+    if(byThree && byFive) {
+        println("FizzBuzz");
+    }
+    else if(byThree) {
+        println("Fizz");
+    }
+    else if(byFive) {
+        println("Buzz");
+    }
+    else {
+        println(number);
+    }
+
+    if(byThree) {
+        nextThree = nextThree + 3;
+    }
+
+    if(byFive) {
+        nextFive = nextFive + 5;
+    }
+
+    number = number + 1;
+}
